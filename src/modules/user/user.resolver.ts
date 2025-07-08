@@ -97,6 +97,19 @@ builder.mutationFields((t) => ({
 			return { ...foundUser, __typename: "User" }
 		},
 	}),
+	logout: t.field({
+		type: "Boolean",
+		resolve: async (_parent, _args, { req }) => {
+			// Clear the session to log out the user
+			req.session.destroy((err) => {
+				if (err) {
+					console.error("Failed to destroy session:", err)
+					return false
+				}
+			})
+			return true
+		},
+	}),
 }))
 
 builder.queryFields((t) => ({

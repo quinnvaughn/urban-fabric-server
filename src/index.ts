@@ -1,13 +1,63 @@
+import "dotenv/config"
+import http from "node:http"
 import { ApolloServer } from "@apollo/server"
-import { startStandaloneServer } from "@apollo/server/standalone"
-import { builder } from "./schema"
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
+import { expressMiddleware } from "@as-integrations/express5"
+import pgSession from "connect-pg-simple"
+import cors from "cors"
+import express from "express"
+import session from "express-session"
+import { Pool } from "pg"
+import { schema } from "./graphql"
+import { createContext, type GraphQLContext } from "./graphql/context"
 
-const server = new ApolloServer({
-	schema: builder.toSchema(),
+const app = express()
+
+const httpServer = http.createServer(app)
+
+const PgSession = pgSession(session)
+
+const pgPool = new Pool({ connectionString: process.env.DATABASE_URL })
+
+const server = new ApolloServer<GraphQLContext>({
+	schema,
+	plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 })
 
-const { url } = await startStandaloneServer(server, {
-	listen: { port: 4000 },
-})
+await server.start()
 
-console.log(`🚀 Server ready at ${url}`)
+app.use(
+	session({
+		store: new PgSession({
+			pool: pgPool,
+			tableName: "sessions",
+		}),
+		secret: process.env.SESSION_SECRET || "keyboard cat",
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			maxAge: 1000 * 60 * 60 * 24 * 30,
+			sameSite: "lax",
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+		},
+	}),
+)
+
+app.use(
+	"/",
+	cors<cors.CorsRequest>({
+		origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+		credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+	}),
+	// 50mb is the limit that `startStandaloneServer` uses, but you may configure this to suit your needs
+	express.json({ limit: "50mb" }),
+	// expressMiddleware accepts the same arguments:
+	// an Apollo Server instance and optional configuration options
+	expressMiddleware(server, {
+		context: createContext,
+	}),
+)
+
+await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve))
+console.log(`🚀 Server ready at http://localhost:4000/`)

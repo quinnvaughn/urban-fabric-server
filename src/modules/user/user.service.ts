@@ -41,7 +41,7 @@ export class UserService {
 
 		const isPasswordValid = await bcrypt.compare(
 			input.password,
-			user.hashed_password,
+			user.hashedPassword,
 		)
 		if (!isPasswordValid) throw new UserError("Invalid email or password")
 

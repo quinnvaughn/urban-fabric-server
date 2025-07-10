@@ -5,7 +5,7 @@ import { baseFields } from "../../db/fields"
 export const users = pgTable("users", {
 	...baseFields,
 	email: varchar("email", { length: 255 }).notNull().unique(),
-	hashed_password: varchar("hashed_password", { length: 255 }).notNull(),
+	hashedPassword: varchar("hashed_password", { length: 255 }).notNull(),
 	name: varchar("name", { length: 100 }),
 	role: varchar("role", { length: 50 }).default("user").notNull(),
 })

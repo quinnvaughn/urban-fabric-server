@@ -5,7 +5,7 @@ import { canvases } from "../canvas/canvas.model"
 
 export const scenarios = pgTable("scenarios", {
 	...baseFields,
-	canvas_id: cuid2("canvas_id")
+	canvasId: cuid2("canvas_id")
 		.notNull()
 		.references(() => canvases.id),
 	name: varchar("name", { length: 255 }).notNull(),

@@ -71,7 +71,6 @@ builder.mutationFields((t) => ({
 			return new Promise<boolean>((resolve) => {
 				req.session.destroy((err) => {
 					if (err) {
-						console.error("Failed to destroy session:", err)
 						return resolve(false)
 					}
 

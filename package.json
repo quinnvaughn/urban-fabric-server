@@ -19,7 +19,7 @@
     "@types/express-session": "^1.18.2",
     "@types/node": "^24.0.10",
     "@types/pg": "^8.15.4",
-    "drizzle-kit": "^0.31.4",
+    "drizzle-kit": "^1.0.0-beta.1-c0277c0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
@@ -33,7 +33,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.0.1",
     "drizzle-cuid2": "^2.1.0",
-    "drizzle-orm": "^0.44.2",
+    "drizzle-orm": "^1.0.0-beta.1-c0277c0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "graphql": "^16.11.0",

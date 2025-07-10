@@ -3,13 +3,17 @@ import { users } from "./user.model"
 
 export async function findUserByEmail(client: DbClient, email: string) {
 	return client.query.users.findFirst({
-		where: (users, { eq }) => eq(users.email, email),
+		where: {
+			email,
+		},
 	})
 }
 
 export async function findUserById(client: DbClient, id: string) {
 	return client.query.users.findFirst({
-		where: (users, { eq }) => eq(users.id, id),
+		where: {
+			id,
+		},
 	})
 }
 

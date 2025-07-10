@@ -17,9 +17,7 @@ export async function createContext({
 	req,
 	res,
 }: ExpressContextFunctionArgument): Promise<GraphQLContext> {
-	const user = await db.query.users.findFirst({
-		where: (users, { eq }) => eq(users.id, req.session?.userId || ""),
-	})
+	const user = await userSvc.getUserById(req.session?.userId || "")
 	return {
 		req,
 		res,

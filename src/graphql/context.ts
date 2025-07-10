@@ -1,12 +1,16 @@
 import type { ExpressContextFunctionArgument } from "@as-integrations/express5"
 import { db } from "../db"
 import type { User } from "../db/schema"
+import * as userSvc from "../modules/user/user.service"
 
 export interface GraphQLContext {
 	user?: User | null
 	db: typeof db
 	req: ExpressContextFunctionArgument["req"]
 	res: ExpressContextFunctionArgument["res"]
+	services: {
+		user: typeof userSvc
+	}
 }
 
 export async function createContext({
@@ -21,5 +25,8 @@ export async function createContext({
 		res,
 		user,
 		db,
+		services: {
+			user: userSvc,
+		},
 	}
 }

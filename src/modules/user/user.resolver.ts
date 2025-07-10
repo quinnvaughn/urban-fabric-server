@@ -1,6 +1,4 @@
-import bcrypt from "bcrypt"
 import { builder } from "../../graphql/builder"
-import { users } from "./user.model"
 import { AuthResponse, LoginInput, RegisterInput } from "./user.type"
 
 builder.mutationFields((t) => ({
@@ -9,7 +7,7 @@ builder.mutationFields((t) => ({
 		args: {
 			input: t.arg({ type: RegisterInput, required: true }),
 		},
-		resolve: async (_parent, { input }, { user, db, req }) => {
+		resolve: async (_parent, { input }, { user, services, req }) => {
 			// check if user is already registered
 			if (user) {
 				return {
@@ -17,39 +15,19 @@ builder.mutationFields((t) => ({
 					message: "You are already registered.",
 				}
 			}
-
-			// check if email is already in use
-			const existingUser = await db.query.users.findFirst({
-				where: (users, { eq }) => eq(users.email, input.email),
-			})
-
-			if (existingUser) {
-				return {
-					__typename: "RegisterError",
-					message: "Email is already in use.",
-				}
-			}
-
-			// generate a hashed password
-			const hashedPassword = await bcrypt.hash(input.password, 12)
-
-			// create a new user
 			try {
-				const [newUser] = await db
-					.insert(users)
-					.values({
-						email: input.email,
-						hashed_password: hashedPassword,
-						name: input.name,
-						role: input.role || "user", // default to 'user' if no role is
-					})
-					.returning()
+				const newUser = await services.user.registerUser({
+					...input,
+					role: input.role || "user",
+				})
 				req.session.userId = newUser.id
 				return { ...newUser, __typename: "User" }
-			} catch {
+			} catch (e: unknown) {
 				return {
 					__typename: "RegisterError",
-					message: "Failed to register user. Please try again.",
+					message:
+						(e as Error).message ||
+						"Failed to register user. Please try again.",
 				}
 			}
 		},
@@ -59,7 +37,7 @@ builder.mutationFields((t) => ({
 		args: {
 			input: t.arg({ type: LoginInput, required: true }),
 		},
-		resolve: async (_parent, { input }, { db, user, req }) => {
+		resolve: async (_parent, { input }, { services, user, req }) => {
 			// check if user is already logged in
 			if (user) {
 				return {
@@ -68,46 +46,43 @@ builder.mutationFields((t) => ({
 				}
 			}
 
-			// find user by email
-			const foundUser = await db.query.users.findFirst({
-				where: (users, { eq }) => eq(users.email, input.email),
-			})
-
-			if (!foundUser) {
+			try {
+				const found = await services.user.loginUser(input)
+				// return user data
+				req.session.userId = found.id
+				return { ...found, __typename: "User" }
+			} catch (err: unknown) {
 				return {
 					__typename: "LoginError",
-					message: "Invalid email or password.",
+					message:
+						(err as Error).message || "Failed to log in. Please try again.",
 				}
 			}
-
-			// verify password
-			const isPasswordValid = await bcrypt.compare(
-				input.password,
-				foundUser.hashed_password,
-			)
-			if (!isPasswordValid) {
-				return {
-					__typename: "LoginError",
-					message: "Invalid email or password.",
-				}
-			}
-
-			// return user data
-			req.session.userId = foundUser.id
-			return { ...foundUser, __typename: "User" }
 		},
 	}),
 	logout: t.field({
 		type: "Boolean",
-		resolve: async (_parent, _args, { req }) => {
+		resolve: async (_parent, _args, { req, res }) => {
+			// If no session exists, return false
+			if (!req.session || !req.session.userId) {
+				return false
+			}
 			// Clear the session to log out the user
-			req.session.destroy((err) => {
-				if (err) {
-					console.error("Failed to destroy session:", err)
-					return false
-				}
+			return new Promise<boolean>((resolve) => {
+				req.session.destroy((err) => {
+					if (err) {
+						console.error("Failed to destroy session:", err)
+						return resolve(false)
+					}
+
+					res.clearCookie("connect.sid", {
+						httpOnly: true,
+						secure: process.env.NODE_ENV === "production",
+						sameSite: "lax",
+					})
+					resolve(true)
+				})
 			})
-			return true
 		},
 	}),
 }))
@@ -118,15 +93,8 @@ builder.queryFields((t) => ({
 		args: {
 			id: t.arg.id({ required: true }),
 		},
-		resolve: async (_parent, args, { db }) => {
-			// Implement the logic to fetch a user by ID
-			const user = await db.query.users.findFirst({
-				where: (users, { eq }) => eq(users.id, args.id),
-			})
-			if (!user) {
-				throw new Error("User not found")
-			}
-			return user
+		resolve: async (_parent, args, { services }) => {
+			return services.user.getUserById(args.id)
 		},
 	}),
 	currentUser: t.field({

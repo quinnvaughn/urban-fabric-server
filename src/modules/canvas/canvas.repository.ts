@@ -15,9 +15,16 @@ export class CanvasRepository {
 				.insert(canvases)
 				.values({ userId, ...input })
 				.returning()
+			// also create empty scenario
 			return [c]
 		})
 		return canvas
+	}
+
+	async delete(id: string): Promise<void> {
+		const canvas = await this.findById(id)
+		if (!canvas) throw new Error("Canvas not found")
+		await this.client.delete(canvases).where(eq(canvases.id, id))
 	}
 
 	async findById(id: string): Promise<Canvas | null> {
@@ -28,19 +35,38 @@ export class CanvasRepository {
 	}
 
 	async publish(id: string): Promise<string> {
-		const canvas = await this.findById(id)
-		if (!canvas) throw new Error("Canvas not found")
-		const base = slugify(canvas.name, { lower: true, strict: true })
-		let slug = base,
-			suffix = 1
-		while (await this.client.query.canvases.findFirst({ where: { slug } })) {
-			slug = `${base}-${suffix}`
-			suffix++
-		}
+		return this.client.transaction(async (tx) => {
+			const repoTx = new CanvasRepository(tx)
+
+			const canvas = await repoTx.findById(id)
+			if (!canvas) throw new Error("Canvas not found")
+
+			const base = slugify(canvas.name, { lower: true, strict: true })
+			let slug = base
+			let suffix = 1
+
+			// loop inside transaction to ensure uniqueness
+			while (await tx.query.canvases.findFirst({ where: { slug } })) {
+				slug = `${base}-${suffix++}`
+			}
+
+			await tx
+				.update(canvases)
+				.set({ slug, published: true, updatedAt: new Date() })
+				.where(eq(canvases.id, id))
+
+			return slug
+		})
+	}
+
+	async update(
+		id: string,
+		updates: Partial<Omit<Canvas, "id" | "userId" | "createdAt">>,
+	): Promise<void> {
 		await this.client
 			.update(canvases)
-			.set({ slug, published: true })
+			.set(updates)
 			.where(eq(canvases.id, id))
-		return slug
+			.execute()
 	}
 }

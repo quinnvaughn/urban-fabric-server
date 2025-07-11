@@ -24,12 +24,14 @@ export class UserService {
 				throw new UserError("Email is already in use")
 			}
 
+			const normalizedEmail = input.email.toLowerCase().trim()
+
 			const hashed = await bcrypt.hash(input.password, 12)
 			const user = await repoTx.createUser({
-				email: input.email,
+				email: normalizedEmail,
 				name: input.name,
 				hashedPassword: hashed,
-				role: input.role,
+				role: input.role || "user",
 			})
 			return user
 		})

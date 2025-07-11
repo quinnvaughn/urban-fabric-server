@@ -11,3 +11,6 @@ export const scenarios = pgTable("scenarios", {
 	name: varchar("name", { length: 255 }).notNull(),
 	position: integer("position").notNull(),
 })
+
+export type Scenario = typeof scenarios.$inferSelect
+export type ScenarioInsert = typeof scenarios.$inferInsert

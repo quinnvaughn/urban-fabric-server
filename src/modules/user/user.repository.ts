@@ -26,12 +26,10 @@ export class UserRepository {
 		hashedPassword: string
 		role?: string
 	}) {
-		const role = input.role || "user"
 		return this.client
 			.insert(users)
 			.values({
 				...input,
-				role,
 			})
 			.returning()
 			.then(([user]) => user)

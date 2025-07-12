@@ -13,5 +13,11 @@ builder.objectType("Scenario", {
 				return loaders.canvas.byId.load(scenario.canvasId)
 			},
 		}),
+		features: t.field({
+			type: ["ScenarioFeature"],
+			resolve: (scenario, _args, { loaders }) => {
+				return loaders.scenarioFeature.byId.load(scenario.id)
+			},
+		}),
 	}),
 })

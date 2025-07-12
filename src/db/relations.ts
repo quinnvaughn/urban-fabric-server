@@ -25,5 +25,16 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.canvases.id,
 			optional: false,
 		}),
+		features: r.many.scenarioFeatures({
+			from: r.scenarios.id,
+			to: r.scenarioFeatures.scenarioId,
+		}),
+	},
+	scenarioFeatures: {
+		scenario: r.one.scenarios({
+			from: r.scenarioFeatures.scenarioId,
+			to: r.scenarios.id,
+			optional: false,
+		}),
 	},
 }))

@@ -62,9 +62,3 @@ export class ValidationError extends ApplicationError {
 		this.errors = errors
 	}
 }
-
-export class InternalError extends ApplicationError {
-	constructor(message = "Internal server error") {
-		super(message)
-	}
-}

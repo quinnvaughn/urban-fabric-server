@@ -17,8 +17,8 @@ export class CanvasService {
 	}
 
 	async createCanvas(
-		input: { name: string; description?: string },
 		userId: string,
+		input: { name: string; description?: string },
 	) {
 		return this.repo.client.transaction(async (tx) => {
 			const canvasRepo = new CanvasRepository(tx)

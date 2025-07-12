@@ -1,5 +1,5 @@
 import { builder } from "../../graphql/builder"
-import { UnauthorizedError } from "../error"
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
 
 builder.mutationFields((t) => ({
 	createCanvas: t.fieldWithInput({
@@ -15,13 +15,10 @@ builder.mutationFields((t) => ({
 			if (!user) {
 				throw new UnauthorizedError("You must be logged in to create a canvas.")
 			}
-			const newCanvas = await services.canvas.createCanvas(
-				{
-					name: input.name.trim(),
-					description: input.description?.trim() || undefined,
-				},
-				user.id,
-			)
+			const newCanvas = await services.canvas.createCanvas(user.id, {
+				name: input.name.trim(),
+				description: input.description?.trim() || undefined,
+			})
 
 			return { ...newCanvas, __typename: "Canvas" }
 		},
@@ -31,6 +28,9 @@ builder.mutationFields((t) => ({
 builder.queryFields((t) => ({
 	canvas: t.field({
 		type: "Canvas",
+		errors: {
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
+		},
 		args: {
 			id: t.arg.id({ required: true }),
 		},
@@ -38,11 +38,7 @@ builder.queryFields((t) => ({
 			if (!user) {
 				throw new UnauthorizedError("You must be logged in to view a canvas.")
 			}
-			const canvas = await services.canvas.getCanvas(id, user.id)
-			if (!canvas) {
-				throw new Error(`Canvas with id ${id} not found`)
-			}
-			return canvas
+			return await services.canvas.getCanvas(id, user.id)
 		},
 	}),
 }))

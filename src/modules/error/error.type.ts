@@ -4,7 +4,6 @@ import {
 	ConflictError,
 	FieldError,
 	ForbiddenError,
-	InternalError,
 	NotFoundError,
 	UnauthorizedError,
 	ValidationError,
@@ -55,10 +54,5 @@ builder.objectType(UnauthorizedError, {
 
 builder.objectType(ConflictError, {
 	name: "ConflictError",
-	interfaces: [ErrorInterface],
-})
-
-builder.objectType(InternalError, {
-	name: "InternalError",
 	interfaces: [ErrorInterface],
 })

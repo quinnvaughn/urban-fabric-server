@@ -69,4 +69,25 @@ export class ScenarioService {
 		}
 		return this.repo.findManyByCanvasId(canvasId)
 	}
+
+	async renameScenario(
+		userId: string,
+		input: { id: string; name: string },
+	): Promise<Scenario> {
+		const trimmedName = input.name.trim()
+		if (!trimmedName) {
+			throw new ValidationError([{ field: "name", message: "Required" }])
+		}
+
+		const scenario = await this.repo.findById(input.id)
+		if (!scenario) {
+			throw new NotFoundError("Scenario not found")
+		}
+		const canvas = await this.canvasRepo.findById(scenario.canvasId)
+		if (!canvas || canvas.userId !== userId) {
+			throw new ForbiddenError("You do not own this canvas")
+		}
+
+		return this.repo.rename(input.id, trimmedName)
+	}
 }

@@ -5,6 +5,7 @@ import "../modules/error/error.type"
 import "../modules/canvas/canvas.type"
 import "../modules/canvas/canvas.resolver"
 import "../modules/scenario/scenario.type"
+import "../modules/scenario/scenario.resolver"
 import { DateTimeResolver } from "graphql-scalars"
 
 builder.queryType({})

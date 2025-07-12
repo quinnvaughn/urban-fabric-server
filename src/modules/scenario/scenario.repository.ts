@@ -68,4 +68,15 @@ export class ScenarioRepository {
 		})
 		return scenarios
 	}
+
+	async rename(id: string, name: string): Promise<Scenario> {
+		const scenario = await this.findById(id)
+		if (!scenario) throw new Error("Scenario not found")
+		const [updatedScenario] = await this.client
+			.update(scenarios)
+			.set({ name })
+			.where(eq(scenarios.id, id))
+			.returning()
+		return updatedScenario
+	}
 }

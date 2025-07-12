@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
 import { UnauthorizedError, ValidationError } from "../error"
+import type { User } from "./user.model"
 import { UserRepository } from "./user.repository"
 import { UserService } from "./user.service"
 
@@ -12,7 +13,9 @@ describe("User Service", () => {
 		vi.restoreAllMocks()
 
 		// Now when UserService ctor does `new UserRepository(...)`, those methods are mocked
-		const fakeDb = { transaction: (cb: any) => cb(fakeDb) } as DbClient
+		const fakeDb = {
+			transaction: async <T>(cb: (tx: DbClient) => Promise<T>) => cb(fakeDb),
+		} as DbClient
 		svc = new UserService(fakeDb)
 	})
 
@@ -25,7 +28,7 @@ describe("User Service", () => {
 			email: "a@b",
 			name: "A",
 			role: "user",
-		} as any)
+		} as User)
 		vi.spyOn(bcrypt, "hash").mockImplementation(() =>
 			Promise.resolve("hashedpw"),
 		)
@@ -51,7 +54,7 @@ describe("User Service", () => {
 	it("registerUser → throws if email already in use", async () => {
 		vi.spyOn(UserRepository.prototype, "findUserByEmail").mockResolvedValue({
 			id: "exists",
-		} as any)
+		} as User)
 
 		await expect(
 			svc.registerUser({ email: "x@x", name: "X", password: "p" }),
@@ -63,7 +66,7 @@ describe("User Service", () => {
 			email: "a@b",
 			name: "A",
 			hashedPassword: "hashedpw",
-		} as any)
+		} as User)
 
 		vi.spyOn(bcrypt, "compare").mockImplementation(() => true)
 
@@ -94,7 +97,7 @@ describe("User Service", () => {
 			email: "a@b",
 			name: "A",
 			hashedPassword: "hashedpw",
-		} as any)
+		} as User)
 
 		vi.spyOn(bcrypt, "compare").mockImplementation(() => false)
 
@@ -108,7 +111,7 @@ describe("User Service", () => {
 			email: "a@b",
 			name: "A",
 			role: "user",
-		} as any)
+		} as User)
 		const out = await svc.getUserById("u1")
 		expect(UserRepository.prototype.findUserById).toHaveBeenCalledWith("u1")
 		expect(out).toEqual({ id: "u1", email: "a@b", name: "A", role: "user" })

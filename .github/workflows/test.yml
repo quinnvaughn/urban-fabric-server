@@ -47,5 +47,7 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Push schema to test DB
+        run: bunx drizzle-kit push
       - name: Run tests
         run: bun run test

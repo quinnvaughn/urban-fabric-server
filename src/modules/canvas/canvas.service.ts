@@ -2,7 +2,6 @@ import type { DbClient } from "../../types/db"
 import {
 	ConflictError,
 	ForbiddenError,
-	InternalError,
 	NotFoundError,
 	ValidationError,
 } from "../error"

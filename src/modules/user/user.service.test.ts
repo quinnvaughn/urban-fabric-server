@@ -102,4 +102,22 @@ describe("User Service", () => {
 			svc.loginUser({ email: "a@b", password: "wrong" }),
 		).rejects.toThrow(UnauthorizedError)
 	})
+	it("getUserById → finds by id", async () => {
+		vi.spyOn(UserRepository.prototype, "findUserById").mockResolvedValue({
+			id: "u1",
+			email: "a@b",
+			name: "A",
+			role: "user",
+		} as any)
+		const out = await svc.getUserById("u1")
+		expect(UserRepository.prototype.findUserById).toHaveBeenCalledWith("u1")
+		expect(out).toEqual({ id: "u1", email: "a@b", name: "A", role: "user" })
+	})
+	it("getUserById → throws if not found", async () => {
+		vi.spyOn(UserRepository.prototype, "findUserById").mockResolvedValue(
+			undefined,
+		)
+
+		await expect(svc.getUserById("u1")).rejects.toThrow("User not found")
+	})
 })

@@ -12,6 +12,16 @@ export class UserRepository {
 		})
 	}
 
+	async findManyUsersByIds(ids: string[]) {
+		return this.client.query.users.findMany({
+			where: {
+				id: {
+					in: ids,
+				},
+			},
+		})
+	}
+
 	async findUserById(id: string) {
 		return this.client.query.users.findFirst({
 			where: {

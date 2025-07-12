@@ -26,9 +26,6 @@ export class CanvasService {
 			const scenarioRepo = new ScenarioRepository(tx)
 
 			const canvas = await canvasRepo.create(input, userId)
-			if (!canvas) {
-				throw new InternalError("Failed to create canvas")
-			}
 			// add default scenario
 			await scenarioRepo.create({
 				canvasId: canvas.id,

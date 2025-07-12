@@ -6,18 +6,18 @@ import {
 	UnauthorizedError,
 	ValidationError,
 } from "../error"
-import { LoginInput, RegisterInput } from "./user.type"
-
-const envVars = getEnvVars()
 
 builder.mutationFields((t) => ({
-	register: t.field({
+	register: t.fieldWithInput({
 		type: "User",
 		errors: {
 			types: [ForbiddenError, ValidationError],
 		},
-		args: {
-			input: t.arg({ type: RegisterInput, required: true }),
+		input: {
+			email: t.input.string({ required: true }),
+			name: t.input.string({ required: true }),
+			password: t.input.string({ required: true }),
+			role: t.input.string({ required: false }),
 		},
 		resolve: async (_parent, { input }, { user, services, req }) => {
 			// check if user is already registered
@@ -32,13 +32,14 @@ builder.mutationFields((t) => ({
 			return { ...newUser, __typename: "User" }
 		},
 	}),
-	login: t.field({
+	login: t.fieldWithInput({
 		type: "User",
 		errors: {
 			types: [ForbiddenError, UnauthorizedError],
 		},
-		args: {
-			input: t.arg({ type: LoginInput, required: true }),
+		input: {
+			email: t.input.string({ required: true }),
+			password: t.input.string({ required: true }),
 		},
 		resolve: async (_parent, { input }, { services, user, req }) => {
 			// check if user is already logged in
@@ -54,6 +55,7 @@ builder.mutationFields((t) => ({
 	logout: t.field({
 		type: "Boolean",
 		resolve: async (_parent, _args, { req, res }) => {
+			const envVars = getEnvVars()
 			// If no session exists, return false
 			if (!req.session || !req.session.userId) {
 				return false
@@ -64,7 +66,6 @@ builder.mutationFields((t) => ({
 					if (err) {
 						return resolve(false)
 					}
-
 					res.clearCookie("connect.sid", {
 						httpOnly: true,
 						secure: envVars.NODE_ENV === "production",

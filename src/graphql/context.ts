@@ -1,35 +1,33 @@
 import type { ExpressContextFunctionArgument } from "@as-integrations/express5"
 import { db } from "../db"
 import type { User } from "../db/schema"
-import { UserService } from "../modules/user/user.service"
+import { createLoaders, type Loaders } from "./loaders"
+import { createServices, type Services } from "./services"
 
 export interface GraphQLContext {
 	user?: User | null
 	db: typeof db
 	req: ExpressContextFunctionArgument["req"]
 	res: ExpressContextFunctionArgument["res"]
-	services: {
-		user: UserService
-	}
+	loaders: Loaders
+	services: Services
 }
-
-const userService = new UserService(db)
 
 export async function createContext({
 	req,
 	res,
 }: ExpressContextFunctionArgument): Promise<GraphQLContext> {
+	const services = createServices(db)
 	const user =
 		req.session?.userId != null
-			? await userService.getUserById(req.session.userId)
+			? await services.user.getUserById(req.session.userId)
 			: null
 	return {
 		req,
+		loaders: createLoaders(db),
 		res,
 		user,
 		db,
-		services: {
-			user: userService,
-		},
+		services,
 	}
 }

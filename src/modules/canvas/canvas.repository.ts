@@ -26,6 +26,17 @@ export class CanvasRepository {
 		await this.client.delete(canvases).where(eq(canvases.id, id))
 	}
 
+	async findManyByIds(ids: string[]): Promise<Canvas[]> {
+		const canvases = await this.client.query.canvases.findMany({
+			where: {
+				id: {
+					in: ids,
+				},
+			},
+		})
+		return canvases
+	}
+
 	async findById(id: string): Promise<Canvas | null> {
 		const canvas = await this.client.query.canvases.findFirst({
 			where: { id },
@@ -56,6 +67,24 @@ export class CanvasRepository {
 
 			return slug
 		})
+	}
+
+	async findByUserId(userId: string): Promise<Canvas[]> {
+		const canvases = await this.client.query.canvases.findMany({
+			where: { userId },
+		})
+		return canvases
+	}
+
+	async findManyByUserIds(userIds: string[]): Promise<Canvas[]> {
+		const canvases = await this.client.query.canvases.findMany({
+			where: {
+				userId: {
+					in: userIds,
+				},
+			},
+		})
+		return canvases
 	}
 
 	async update(

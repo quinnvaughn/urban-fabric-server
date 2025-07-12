@@ -1,4 +1,4 @@
-import { envVars } from "../../config"
+import { getEnvVars } from "../../config"
 import { builder } from "../../graphql/builder"
 import {
 	ForbiddenError,
@@ -7,6 +7,8 @@ import {
 	ValidationError,
 } from "../error"
 import { LoginInput, RegisterInput } from "./user.type"
+
+const envVars = getEnvVars()
 
 builder.mutationFields((t) => ({
 	register: t.field({

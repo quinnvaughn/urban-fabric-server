@@ -8,7 +8,7 @@ import cors from "cors"
 import express from "express"
 import session from "express-session"
 import { Pool } from "pg"
-import { envVars } from "./config"
+import { getEnvVars } from "./config"
 import { schema } from "./graphql"
 import { createContext, type GraphQLContext } from "./graphql/context"
 
@@ -17,6 +17,8 @@ const app = express()
 const httpServer = http.createServer(app)
 
 const PgSession = pgSession(session)
+
+const envVars = getEnvVars()
 
 const pgPool = new Pool({ connectionString: envVars.DATABASE_URL })
 

@@ -16,12 +16,12 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		scenarios: r.many.scenarios({
 			from: r.canvases.id,
-			to: r.scenarios.canvas_id,
+			to: r.scenarios.canvasId,
 		}),
 	},
 	scenarios: {
 		canvas: r.one.canvases({
-			from: r.scenarios.canvas_id,
+			from: r.scenarios.canvasId,
 			to: r.canvases.id,
 			optional: false,
 		}),

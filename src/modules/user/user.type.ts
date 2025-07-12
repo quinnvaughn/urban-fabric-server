@@ -1,4 +1,5 @@
 import { builder } from "../../graphql/builder"
+import { ValidationError } from "../error"
 
 builder.objectType("User", {
 	fields: (t) => ({
@@ -25,18 +26,12 @@ export const LoginInput = builder.inputType("LoginInput", {
 	}),
 })
 
-export const AuthError = builder.simpleObject("AuthError", {
-	fields: (t) => ({
-		message: t.string({ nullable: true }),
-	}),
-})
-
-export const AuthResponse = builder.unionType("AuthResponse", {
-	types: ["User", AuthError],
+export const RegisterResponse = builder.unionType("RegisterResponse", {
+	types: ["User", ValidationError],
 	resolveType: (value) => {
 		if ("id" in value) {
 			return "User"
 		}
-		return "AuthError"
+		return "ValidationError"
 	},
 })

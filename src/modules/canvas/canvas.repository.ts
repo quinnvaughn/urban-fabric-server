@@ -15,7 +15,6 @@ export class CanvasRepository {
 				.insert(canvases)
 				.values({ userId, ...input })
 				.returning()
-			// also create empty scenario
 			return [c]
 		})
 		return canvas

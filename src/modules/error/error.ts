@@ -1,12 +1,19 @@
 export abstract class ApplicationError extends Error {
 	public readonly name: string
-	public readonly statusCode: string
 
-	constructor(message: string, code: string) {
+	constructor(message: string) {
 		super(message)
 		this.name = this.constructor.name
-		this.statusCode = code
 		Object.setPrototypeOf(this, new.target.prototype)
+	}
+}
+
+/**
+ * 401 Unauthorized Error
+ */
+export class UnauthorizedError extends ApplicationError {
+	constructor(message = "Unauthorized") {
+		super(message)
 	}
 }
 
@@ -15,7 +22,7 @@ export abstract class ApplicationError extends Error {
  */
 export class NotFoundError extends ApplicationError {
 	constructor(message = "Resource not found") {
-		super(message, "NOT_FOUND")
+		super(message)
 	}
 }
 
@@ -24,7 +31,16 @@ export class NotFoundError extends ApplicationError {
  */
 export class ForbiddenError extends ApplicationError {
 	constructor(message = "Forbidden") {
-		super(message, "FORBIDDEN")
+		super(message)
+	}
+}
+
+/**
+ * 409 Conflict Error
+ */
+export class ConflictError extends ApplicationError {
+	constructor(message = "Conflict") {
+		super(message)
 	}
 }
 
@@ -39,9 +55,16 @@ export class FieldError {
  * 400 Bad Request Error
  */
 export class ValidationError extends ApplicationError {
-	public readonly errors?: FieldError[]
-	constructor(message = "Validation failed", errors?: FieldError[]) {
-		super(message, "VALIDATION_ERROR")
+	public readonly errors: FieldError[]
+
+	constructor(errors: FieldError[]) {
+		super("Validation failed")
 		this.errors = errors
+	}
+}
+
+export class InternalError extends ApplicationError {
+	constructor(message = "Internal server error") {
+		super(message)
 	}
 }

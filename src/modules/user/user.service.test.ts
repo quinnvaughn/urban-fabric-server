@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
+import { ValidationError } from "../error"
 import { UserRepository } from "./user.repository"
-import { UserError, UserService } from "./user.service"
+import { UserService } from "./user.service"
 
 describe("User Service", () => {
 	let svc: UserService
@@ -58,6 +59,6 @@ describe("User Service", () => {
 
 		await expect(
 			svc.registerUser({ email: "x@x", name: "X", password: "p" }),
-		).rejects.toThrow(UserError)
+		).rejects.toThrow(ValidationError)
 	})
 })

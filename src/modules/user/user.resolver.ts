@@ -1,63 +1,51 @@
 import { builder } from "../../graphql/builder"
-import { AuthResponse, LoginInput, RegisterInput } from "./user.type"
+import {
+	ForbiddenError,
+	NotFoundError,
+	UnauthorizedError,
+	ValidationError,
+} from "../error"
+import { LoginInput, RegisterInput } from "./user.type"
 
 builder.mutationFields((t) => ({
 	register: t.field({
-		type: AuthResponse,
+		type: "User",
+		errors: {
+			types: [ForbiddenError, ValidationError],
+		},
 		args: {
 			input: t.arg({ type: RegisterInput, required: true }),
 		},
 		resolve: async (_parent, { input }, { user, services, req }) => {
 			// check if user is already registered
 			if (user) {
-				return {
-					__typename: "RegisterError",
-					message: "You are already registered.",
-				}
+				throw new ForbiddenError("You are already registered.")
 			}
-			try {
-				const newUser = await services.user.registerUser({
-					...input,
-					role: input.role || "user",
-				})
-				req.session.userId = newUser.id
-				return { ...newUser, __typename: "User" }
-			} catch (e: unknown) {
-				return {
-					__typename: "RegisterError",
-					message:
-						(e as Error).message ||
-						"Failed to register user. Please try again.",
-				}
-			}
+			const newUser = await services.user.registerUser({
+				...input,
+				role: input.role || "user",
+			})
+			req.session.userId = newUser.id
+			return { ...newUser, __typename: "User" }
 		},
 	}),
 	login: t.field({
-		type: AuthResponse,
+		type: "User",
+		errors: {
+			types: [ForbiddenError, UnauthorizedError],
+		},
 		args: {
 			input: t.arg({ type: LoginInput, required: true }),
 		},
 		resolve: async (_parent, { input }, { services, user, req }) => {
 			// check if user is already logged in
 			if (user) {
-				return {
-					__typename: "LoginError",
-					message: "You are already logged in.",
-				}
+				throw new ForbiddenError("You are already logged in.")
 			}
-
-			try {
-				const found = await services.user.loginUser(input)
-				// return user data
-				req.session.userId = found.id
-				return { ...found, __typename: "User" }
-			} catch (err: unknown) {
-				return {
-					__typename: "LoginError",
-					message:
-						(err as Error).message || "Failed to log in. Please try again.",
-				}
-			}
+			const found = await services.user.loginUser(input)
+			// return user data
+			req.session.userId = found.id
+			return { ...found, __typename: "User" }
 		},
 	}),
 	logout: t.field({
@@ -89,6 +77,9 @@ builder.mutationFields((t) => ({
 builder.queryFields((t) => ({
 	user: t.field({
 		type: "User",
+		errors: {
+			types: [NotFoundError],
+		},
 		args: {
 			id: t.arg.id({ required: true }),
 		},

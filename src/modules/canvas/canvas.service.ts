@@ -1,5 +1,11 @@
 import type { DbClient } from "../../types/db"
-import { ForbiddenError, NotFoundError, ValidationError } from "../error"
+import {
+	ConflictError,
+	ForbiddenError,
+	InternalError,
+	NotFoundError,
+	ValidationError,
+} from "../error"
 import { ScenarioRepository } from "../scenario/scenario.repository"
 import type { Canvas } from "./canvas.model"
 import { CanvasRepository } from "./canvas.repository"
@@ -21,7 +27,7 @@ export class CanvasService {
 
 			const canvas = await canvasRepo.create(input, userId)
 			if (!canvas) {
-				throw new ValidationError("Failed to create canvas")
+				throw new InternalError("Failed to create canvas")
 			}
 			// add default scenario
 			await scenarioRepo.create({
@@ -52,9 +58,7 @@ export class CanvasService {
 	) {
 		await this.getCanvas(id, userId) // Ensure canvas exists and belongs to user
 		if (updates.name !== undefined && !updates.name.trim()) {
-			throw new ValidationError("Canvas name cannot be empty", [
-				{ field: "name", message: "Required" },
-			])
+			throw new ValidationError([{ field: "name", message: "Required" }])
 		}
 		await this.repo.update(id, updates)
 	}
@@ -67,7 +71,7 @@ export class CanvasService {
 	async publishCanvas(id: string, userId: string): Promise<string> {
 		const canvas = await this.getCanvas(id, userId)
 		if (canvas.published) {
-			throw new ValidationError("Canvas is already published")
+			throw new ConflictError("Canvas is already published")
 		}
 		return this.repo.publish(id)
 	}

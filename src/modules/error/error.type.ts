@@ -1,10 +1,22 @@
 import { builder } from "../../graphql/builder"
 import {
+	type ApplicationError,
+	ConflictError,
 	FieldError,
 	ForbiddenError,
+	InternalError,
 	NotFoundError,
+	UnauthorizedError,
 	ValidationError,
 } from "./error"
+
+const ErrorInterface = builder
+	.interfaceRef<ApplicationError>("ApplicationError")
+	.implement({
+		fields: (t) => ({
+			message: t.exposeString("message"),
+		}),
+	})
 
 builder.objectType(FieldError, {
 	name: "FieldError",
@@ -16,29 +28,37 @@ builder.objectType(FieldError, {
 
 builder.objectType(NotFoundError, {
 	name: "NotFoundError",
-	fields: (t) => ({
-		message: t.exposeString("message"),
-		statusCode: t.exposeString("statusCode"),
-	}),
+	interfaces: [ErrorInterface],
 })
 
 builder.objectType(ForbiddenError, {
 	name: "ForbiddenError",
-	fields: (t) => ({
-		message: t.exposeString("message"),
-		statusCode: t.exposeString("statusCode"),
-	}),
+	interfaces: [ErrorInterface],
 })
 
 builder.objectType(ValidationError, {
 	name: "ValidationError",
+	interfaces: [ErrorInterface],
 	fields: (t) => ({
-		message: t.exposeString("message"),
-		statusCode: t.exposeString("statusCode"),
 		errors: t.field({
 			type: [FieldError],
 			nullable: true,
 			resolve: (error) => error.errors || [],
 		}),
 	}),
+})
+
+builder.objectType(UnauthorizedError, {
+	name: "UnauthorizedError",
+	interfaces: [ErrorInterface],
+})
+
+builder.objectType(ConflictError, {
+	name: "ConflictError",
+	interfaces: [ErrorInterface],
+})
+
+builder.objectType(InternalError, {
+	name: "InternalError",
+	interfaces: [ErrorInterface],
 })

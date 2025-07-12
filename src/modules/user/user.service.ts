@@ -1,8 +1,7 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
+import { NotFoundError, UnauthorizedError, ValidationError } from "../error"
 import { UserRepository } from "./user.repository"
-
-export class UserError extends Error {}
 
 export class UserService {
 	private repo: UserRepository
@@ -21,7 +20,9 @@ export class UserService {
 			const repoTx = new UserRepository(tx)
 			const existing = await repoTx.findUserByEmail(input.email)
 			if (existing) {
-				throw new UserError("Email is already in use")
+				throw new ValidationError([
+					{ field: "email", message: "Email is already in use" },
+				])
 			}
 
 			const normalizedEmail = input.email.toLowerCase().trim()
@@ -39,20 +40,16 @@ export class UserService {
 
 	async loginUser(input: { email: string; password: string }) {
 		const user = await this.repo.findUserByEmail(input.email)
-		if (!user) throw new UserError("Invalid email or password")
-
-		const isPasswordValid = await bcrypt.compare(
-			input.password,
-			user.hashedPassword,
-		)
-		if (!isPasswordValid) throw new UserError("Invalid email or password")
+		if (!user || !(await bcrypt.compare(input.password, user.hashedPassword))) {
+			throw new UnauthorizedError("Invalid email or password")
+		}
 
 		return user
 	}
 
 	async getUserById(id: string) {
 		const user = await this.repo.findUserById(id)
-		if (!user) throw new UserError("User not found")
+		if (!user) throw new NotFoundError("User not found")
 		return user
 	}
 }

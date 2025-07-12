@@ -8,6 +8,7 @@ import cors from "cors"
 import express from "express"
 import session from "express-session"
 import { Pool } from "pg"
+import { envVars } from "./config"
 import { schema } from "./graphql"
 import { createContext, type GraphQLContext } from "./graphql/context"
 
@@ -17,7 +18,7 @@ const httpServer = http.createServer(app)
 
 const PgSession = pgSession(session)
 
-const pgPool = new Pool({ connectionString: process.env.DATABASE_URL })
+const pgPool = new Pool({ connectionString: envVars.DATABASE_URL })
 
 const server = new ApolloServer<GraphQLContext>({
 	schema,
@@ -32,14 +33,14 @@ app.use(
 			pool: pgPool,
 			tableName: "sessions",
 		}),
-		secret: process.env.SESSION_SECRET || "keyboard cat",
+		secret: envVars.SESSION_SECRET,
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 30,
 			sameSite: "lax",
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
+			secure: envVars.NODE_ENV === "production",
 		},
 	}),
 )
@@ -47,7 +48,7 @@ app.use(
 app.use(
 	"/",
 	cors<cors.CorsRequest>({
-		origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+		origin: envVars.CORS_ORIGIN,
 		credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 	}),
 	// 50mb is the limit that `startStandaloneServer` uses, but you may configure this to suit your needs

@@ -1,3 +1,4 @@
+import { envVars } from "../../config"
 import { builder } from "../../graphql/builder"
 import {
 	ForbiddenError,
@@ -64,7 +65,7 @@ builder.mutationFields((t) => ({
 
 					res.clearCookie("connect.sid", {
 						httpOnly: true,
-						secure: process.env.NODE_ENV === "production",
+						secure: envVars.NODE_ENV === "production",
 						sameSite: "lax",
 					})
 					resolve(true)

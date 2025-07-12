@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
-import { ValidationError } from "../error"
+import { UnauthorizedError, ValidationError } from "../error"
 import { UserRepository } from "./user.repository"
 import { UserService } from "./user.service"
 
@@ -11,7 +11,12 @@ describe("User Service", () => {
 		// Restore any previous spies
 		vi.restoreAllMocks()
 
-		// Stub the repository methods on the prototype
+		// Now when UserService ctor does `new UserRepository(...)`, those methods are mocked
+		const fakeDb = { transaction: (cb: any) => cb(fakeDb) } as DbClient
+		svc = new UserService(fakeDb)
+	})
+
+	it("registerUser -> hashes & creates when email not found", async () => {
 		vi.spyOn(UserRepository.prototype, "findUserByEmail").mockResolvedValue(
 			undefined,
 		)
@@ -21,18 +26,9 @@ describe("User Service", () => {
 			name: "A",
 			role: "user",
 		} as any)
-
-		// Stub bcrypt.hash
 		vi.spyOn(bcrypt, "hash").mockImplementation(() =>
 			Promise.resolve("hashedpw"),
 		)
-
-		// Now when UserService ctor does `new UserRepository(...)`, those methods are mocked
-		const fakeDb = { transaction: (cb: any) => cb(fakeDb) } as DbClient
-		svc = new UserService(fakeDb)
-	})
-
-	it("registerUser -> hashes & creates when email not found", async () => {
 		const out = await svc.registerUser({
 			email: " Foo@Bar.COM ",
 			name: "Foo",
@@ -60,5 +56,50 @@ describe("User Service", () => {
 		await expect(
 			svc.registerUser({ email: "x@x", name: "X", password: "p" }),
 		).rejects.toThrow(ValidationError)
+	})
+	it("loginUser -> finds by email, compares password", async () => {
+		vi.spyOn(UserRepository.prototype, "findUserByEmail").mockResolvedValue({
+			id: "u1",
+			email: "a@b",
+			name: "A",
+			hashedPassword: "hashedpw",
+		} as any)
+
+		vi.spyOn(bcrypt, "compare").mockImplementation(() => true)
+
+		const out = await svc.loginUser({ email: "a@b", password: "secret" })
+
+		expect(UserRepository.prototype.findUserByEmail).toHaveBeenCalledWith("a@b")
+		expect(bcrypt.compare).toHaveBeenCalledWith("secret", "hashedpw")
+
+		expect(out).toEqual({
+			id: "u1",
+			email: "a@b",
+			name: "A",
+			hashedPassword: "hashedpw",
+		})
+	})
+	it("loginUser → throws if email not found", async () => {
+		vi.spyOn(UserRepository.prototype, "findUserByEmail").mockResolvedValue(
+			undefined,
+		)
+
+		await expect(
+			svc.loginUser({ email: "x@x", password: "p" }),
+		).rejects.toThrow(UnauthorizedError)
+	})
+	it("loginUser → throws if password does not match", async () => {
+		vi.spyOn(UserRepository.prototype, "findUserByEmail").mockResolvedValue({
+			id: "u1",
+			email: "a@b",
+			name: "A",
+			hashedPassword: "hashedpw",
+		} as any)
+
+		vi.spyOn(bcrypt, "compare").mockImplementation(() => false)
+
+		await expect(
+			svc.loginUser({ email: "a@b", password: "wrong" }),
+		).rejects.toThrow(UnauthorizedError)
 	})
 })

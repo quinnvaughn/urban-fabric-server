@@ -27,3 +27,22 @@ builder.mutationFields((t) => ({
 		},
 	}),
 }))
+
+builder.queryFields((t) => ({
+	canvas: t.field({
+		type: "Canvas",
+		args: {
+			id: t.arg.id({ required: true }),
+		},
+		resolve: async (_parent, { id }, { services, user }) => {
+			if (!user) {
+				throw new UnauthorizedError("You must be logged in to view a canvas.")
+			}
+			const canvas = await services.canvas.getCanvas(id, user.id)
+			if (!canvas) {
+				throw new Error(`Canvas with id ${id} not found`)
+			}
+			return canvas
+		},
+	}),
+}))

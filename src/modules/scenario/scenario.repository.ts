@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { asc, eq, sql } from "drizzle-orm"
 import type { DbClient } from "../../types/db"
 import { type Scenario, scenarios } from "./scenario.model"
 
@@ -38,5 +38,34 @@ export class ScenarioRepository {
 			where: { id },
 		})
 		return scenario ?? null
+	}
+
+	async findManyByIds(ids: string[]): Promise<Scenario[]> {
+		const scenarios = await this.client.query.scenarios.findMany({
+			where: {
+				id: { in: ids },
+			},
+		})
+		return scenarios
+	}
+
+	async findManyByCanvasId(canvasId: string): Promise<Scenario[]> {
+		const scenarios = await this.client.query.scenarios.findMany({
+			where: {
+				canvasId,
+			},
+			orderBy: (scenarios) => [asc(scenarios.position)],
+		})
+		return scenarios
+	}
+
+	async findManyByCanvasIds(canvasIds: string[]): Promise<Scenario[]> {
+		const scenarios = await this.client.query.scenarios.findMany({
+			where: {
+				canvasId: { in: canvasIds },
+			},
+			orderBy: (scenarios) => [asc(scenarios.position)],
+		})
+		return scenarios
 	}
 }

@@ -15,5 +15,11 @@ builder.objectType("Canvas", {
 				return loaders.user.load(canvas.userId)
 			},
 		}),
+		scenarios: t.field({
+			type: ["Scenario"],
+			resolve: (canvas, _args, { loaders }) => {
+				return loaders.scenario.byCanvasId.load(canvas.id)
+			},
+		}),
 	}),
 })

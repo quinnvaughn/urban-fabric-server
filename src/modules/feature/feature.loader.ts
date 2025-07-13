@@ -1,11 +1,11 @@
 import DataLoader from "dataloader"
-import type { ScenarioFeature } from "./scenario-feature.model"
-import type { ScenarioFeatureRepository } from "./scenario-feature.repository"
+import type { Feature } from "./feature.model"
+import type { FeatureRepository } from "./feature.repository"
 
-const scenarioFeatureLoader = (repo: ScenarioFeatureRepository) =>
+const byScenarioFeatureLoader = (repo: FeatureRepository) =>
 	new DataLoader(async (scenarioIds: readonly string[]) => {
 		const features = await repo.findByScenarioIds(scenarioIds as string[])
-		const grouped = new Map<string, ScenarioFeature[]>()
+		const grouped = new Map<string, Feature[]>()
 		for (const feature of features) {
 			if (!grouped.has(feature.scenarioId)) grouped.set(feature.scenarioId, [])
 			grouped.get(feature.scenarioId)?.push(feature)
@@ -13,6 +13,6 @@ const scenarioFeatureLoader = (repo: ScenarioFeatureRepository) =>
 		return scenarioIds.map((id) => grouped.get(id) ?? [])
 	})
 
-export const scenarioFeatureLoaders = (repo: ScenarioFeatureRepository) => ({
-	byId: scenarioFeatureLoader(repo),
+export const featureLoaders = (repo: FeatureRepository) => ({
+	byScenarioId: byScenarioFeatureLoader(repo),
 })

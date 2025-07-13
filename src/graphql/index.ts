@@ -6,8 +6,9 @@ import "../modules/canvas/canvas.type"
 import "../modules/canvas/canvas.resolver"
 import "../modules/scenario/scenario.type"
 import "../modules/scenario/scenario.resolver"
-import "../modules/scenario-feature/scenario-feature.type"
-import "../modules/scenario-feature/scenario-feature.resolver"
+import "../modules/feature/feature.type"
+import "../modules/feature/feature.resolver"
+import "../modules/feature-option/feature-option.type"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

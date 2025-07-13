@@ -2,15 +2,15 @@ import { builder } from "../../graphql/builder"
 import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
 
 builder.mutationFields((t) => ({
-	createScenarioFeature: t.fieldWithInput({
-		type: "ScenarioFeature",
+	upsertFeature: t.fieldWithInput({
+		type: "Feature",
 		errors: {
 			types: [UnauthorizedError, NotFoundError, ForbiddenError],
 			directResult: false,
 		},
 		input: {
 			scenarioId: t.input.id({ required: true }),
-			type: t.input.string({ required: true }),
+			optionId: t.input.id({ required: true }),
 			geometry: t.input.field({ type: "GeoJSON", required: true }),
 			properties: t.input.field({ type: "JSON", required: true }),
 		},
@@ -20,7 +20,7 @@ builder.mutationFields((t) => ({
 					"You must be logged in to create a scenario feature",
 				)
 			}
-			return await services.scenarioFeature.create(user.id, input)
+			return await services.feature.upsert(user.id, input)
 		},
 	}),
 }))

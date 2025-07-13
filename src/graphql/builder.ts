@@ -3,7 +3,9 @@ import ErrorsPlugin from "@pothos/plugin-errors"
 import SimpleObjectsPlugin from "@pothos/plugin-simple-objects"
 import WithInputPlugin from "@pothos/plugin-with-input"
 import type * as GEOJSON from "geojson"
-import type { Canvas, Scenario, ScenarioFeature, User } from "../db/schema"
+import type { Canvas, Feature, Scenario, User } from "../db/schema"
+import type { FeatureOption } from "../modules/feature-option/feature-option.model"
+import type { GeometryType } from "../modules/feature-option/geometry-type.model"
 import type { GraphQLContext } from "./context"
 
 function capitalize(str: string): string {
@@ -32,9 +34,10 @@ export const builder = new SchemaBuilder<{
 		User: User
 		Canvas: Canvas
 		Scenario: Scenario
+		FeatureOption: FeatureOption
 	}
 	Interfaces: {
-		ScenarioFeature: ScenarioFeature
+		Feature: Feature
 	}
 }>({
 	defaultInputFieldRequiredness: true,

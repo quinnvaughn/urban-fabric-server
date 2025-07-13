@@ -9,14 +9,16 @@ builder.objectType("Scenario", {
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 		canvas: t.field({
 			type: "Canvas",
-			resolve: (scenario, _args, { loaders }) => {
-				return loaders.canvas.byId.load(scenario.canvasId)
+			resolve: async (scenario, _args, { loaders }) => {
+				const canvas = await loaders.canvas.byId.load(scenario.canvasId)
+				if (!canvas) throw new Error("Canvas not found")
+				return canvas
 			},
 		}),
 		features: t.field({
-			type: ["ScenarioFeature"],
-			resolve: (scenario, _args, { loaders }) => {
-				return loaders.scenarioFeature.byId.load(scenario.id)
+			type: ["Feature"],
+			resolve: async (scenario, _args, { loaders }) => {
+				return await loaders.feature.byScenarioId.load(scenario.id)
 			},
 		}),
 	}),

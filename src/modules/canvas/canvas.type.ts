@@ -11,14 +11,18 @@ builder.objectType("Canvas", {
 		published: t.exposeBoolean("published"),
 		author: t.field({
 			type: "User",
-			resolve: (canvas, _args, { loaders }) => {
-				return loaders.user.load(canvas.userId)
+			resolve: async (canvas, _args, { loaders }) => {
+				const author = await loaders.user.load(canvas.userId)
+				if (!author) throw new Error("Author not found")
+				return author
 			},
 		}),
 		scenarios: t.field({
 			type: ["Scenario"],
-			resolve: (canvas, _args, { loaders }) => {
-				return loaders.scenario.byCanvasId.load(canvas.id)
+			resolve: async (canvas, _args, { loaders }) => {
+				const scenarios = await loaders.scenario.byCanvasId.load(canvas.id)
+				if (!scenarios) throw new Error("Scenarios not found")
+				return scenarios
 			},
 		}),
 	}),

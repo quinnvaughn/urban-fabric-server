@@ -1,6 +1,5 @@
 import { match } from "ts-pattern"
 import { builder } from "../../graphql/builder"
-import { type Geometry, GeometryInterface } from "../geojson/geojson.type"
 
 abstract class ScenarioFeature {
 	id!: string
@@ -8,7 +7,7 @@ abstract class ScenarioFeature {
 	updatedAt!: Date
 	scenarioId!: string
 	type!: string
-	geometry!: Geometry
+	geometry!: GeoJSON.Geometry
 }
 
 builder.interfaceType("ScenarioFeature", {
@@ -19,8 +18,8 @@ builder.interfaceType("ScenarioFeature", {
 		scenarioId: t.exposeID("scenarioId"),
 		type: t.exposeString("type"),
 		geometry: t.field({
-			type: GeometryInterface,
-			resolve: (feature) => feature.geometry as Geometry,
+			type: "GeoJSON",
+			resolve: (feature) => feature.geometry as GeoJSON.Geometry,
 		}),
 	}),
 	resolveType: (feature) => {
@@ -50,7 +49,7 @@ builder.objectType(BikeLaneFeature, {
 		updatedAt: t.field({ type: "DateTime", resolve: (f) => f.updatedAt }),
 		type: t.exposeString("type"),
 		geometry: t.field({
-			type: GeometryInterface,
+			type: "GeoJSON",
 			resolve: (f) => f.geometry,
 		}),
 		width: t.float({ resolve: (f) => f.properties.width }),

@@ -8,7 +8,6 @@ import "../modules/scenario/scenario.type"
 import "../modules/scenario/scenario.resolver"
 import "../modules/scenario-feature/scenario-feature.type"
 import "../modules/scenario-feature/scenario-feature.resolver"
-import "../modules/geojson/geojson.type"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

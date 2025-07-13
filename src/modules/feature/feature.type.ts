@@ -72,15 +72,13 @@ builder.objectType(BikeLaneFeature, {
 				return scenario
 			},
 		}),
-		// TODO: Uncomment when feature options are implemented
-		// option: t.field({
-		// 	type: 'FeatureOption',
-		// 	resolve: async (feature, _args, { loaders }) => {
-		// 		if (!feature.optionId) return null
-		// 		const option = await loaders.featureOption.byId.load(feature.optionId)
-		// 		if (!option) throw new Error("Feature option not found")
-		// 		return option
-		// 	}
-		// })
+		option: t.field({
+			type: "FeatureOption",
+			resolve: async (feature, _args, { loaders }) => {
+				const option = await loaders.featureOption.byId.load(feature.optionId)
+				if (!option) throw new Error("Feature option not found")
+				return option
+			},
+		}),
 	}),
 })

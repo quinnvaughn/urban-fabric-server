@@ -9,6 +9,9 @@ import "../modules/scenario/scenario.resolver"
 import "../modules/feature/feature.type"
 import "../modules/feature/feature.resolver"
 import "../modules/feature-option/feature-option.type"
+import "../modules/feature-option/feature-option.resolver"
+import "../modules/category/category.type"
+import "../modules/category/category.resolver"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

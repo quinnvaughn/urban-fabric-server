@@ -11,10 +11,9 @@ export const features = pgTable("features", {
 		.references(() => scenarios.id),
 	geometry: jsonb("geometry").notNull(),
 	properties: jsonb("properties").notNull().default("{}"),
-	optionId: varchar("option_id", { length: 64 }).references(
-		() => featureOptions.id,
-		{ onDelete: "cascade" },
-	),
+	optionId: varchar("option_id", { length: 64 })
+		.notNull()
+		.references(() => featureOptions.id, { onDelete: "cascade" }),
 })
 
 export type Feature = typeof features.$inferSelect

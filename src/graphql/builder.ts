@@ -3,7 +3,7 @@ import ErrorsPlugin from "@pothos/plugin-errors"
 import SimpleObjectsPlugin from "@pothos/plugin-simple-objects"
 import WithInputPlugin from "@pothos/plugin-with-input"
 import type * as GEOJSON from "geojson"
-import type { Canvas, Feature, Scenario, User } from "../db/schema"
+import type { Canvas, Category, Feature, Scenario, User } from "../db/schema"
 import type { FeatureOption } from "../modules/feature-option/feature-option.model"
 import type { GeometryType } from "../modules/feature-option/geometry-type.model"
 import type { GraphQLContext } from "./context"
@@ -35,6 +35,7 @@ export const builder = new SchemaBuilder<{
 		Canvas: Canvas
 		Scenario: Scenario
 		FeatureOption: FeatureOption
+		Category: Category
 	}
 	Interfaces: {
 		Feature: Feature

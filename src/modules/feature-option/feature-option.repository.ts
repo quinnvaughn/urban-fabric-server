@@ -39,6 +39,16 @@ export class FeatureOptionRepository {
 		})
 	}
 
+	async findByCategoryIds(categoryIds: string[]): Promise<FeatureOption[]> {
+		return this.client.query.featureOptions.findMany({
+			where: {
+				categoryId: {
+					in: categoryIds,
+				},
+			},
+		})
+	}
+
 	async create(input: FeatureOptionInsert): Promise<FeatureOption> {
 		const [row] = await this.client
 			.insert(featureOptions)

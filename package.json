@@ -9,7 +9,8 @@
     "dev": "bun --watch src/index.ts",
     "test": "bun --env=test vitest run --coverage",
     "test:watch": "bun --env=test vitest --watch",
-    "test:ui": "bun --env=test vitest --ui"
+    "test:ui": "bun --env=test vitest --ui",
+    "seed": "bun src/seed/index.ts"
   },
   "keywords": [],
   "author": "",

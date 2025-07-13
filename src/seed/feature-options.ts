@@ -61,10 +61,11 @@ const DEFAULT_SCENARIO_FEATURE_OPTIONS: FeatureOptionInsert[] = [
 	},
 ]
 
-export async function seedScenarioFeatureOptions() {
+export async function seedFeatureOptions() {
 	const repo = new FeatureOptionRepository(db)
 
 	for (const option of DEFAULT_SCENARIO_FEATURE_OPTIONS) {
 		await repo.upsert(option)
 	}
+	console.log("✅ Seeded scenario feature options")
 }

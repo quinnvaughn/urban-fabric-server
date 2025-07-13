@@ -36,6 +36,11 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.scenarios.id,
 			optional: false,
 		}),
+		option: r.one.featureOptions({
+			from: r.features.optionId,
+			to: r.featureOptions.id,
+			optional: true,
+		}),
 	},
 	featureOptions: {
 		category: r.one.categories({

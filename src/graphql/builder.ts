@@ -5,7 +5,6 @@ import WithInputPlugin from "@pothos/plugin-with-input"
 import type * as GEOJSON from "geojson"
 import type { Canvas, Category, Feature, Scenario, User } from "../db/schema"
 import type { FeatureOption } from "../modules/feature-option/feature-option.model"
-import type { GeometryType } from "../modules/feature-option/geometry-type.model"
 import type { GraphQLContext } from "./context"
 
 function capitalize(str: string): string {

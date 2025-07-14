@@ -76,12 +76,18 @@ export class CanvasRepository {
 		return canvases
 	}
 
-	async findManyByUserIds(userIds: string[]): Promise<Canvas[]> {
+	async findManyByUserIds(
+		userIds: string[],
+		orderBy: "asc" | "desc" = "desc",
+	): Promise<Canvas[]> {
 		const canvases = await this.client.query.canvases.findMany({
 			where: {
 				userId: {
 					in: userIds,
 				},
+			},
+			orderBy: {
+				updatedAt: orderBy,
 			},
 		})
 		return canvases

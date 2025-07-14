@@ -7,7 +7,7 @@ const envSchema = z.object({
 	NODE_ENV: z
 		.enum(["development", "test", "production"])
 		.default("development"),
-	CORS_ORIGIN: z.url().optional(),
+	CORS_ORIGIN: z.url().optional().default("http://localhost:3000"),
 	SESSION_SECRET: z
 		.string()
 		.min(1, "SESSION_SECRET must be set")

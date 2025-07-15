@@ -17,19 +17,19 @@ function createScenariosByCanvasIdLoader(repo: ScenarioRepository) {
 	return new DataLoader<
 		string,
 		Awaited<ReturnType<typeof repo.findManyByCanvasId>> | null
-	>(async (canvasIds: readonly string[]) => {
-		const rows = await repo.findManyByCanvasIds([...canvasIds])
+	>(async (simulationIds: readonly string[]) => {
+		const rows = await repo.findManyByCanvasIds([...simulationIds])
 
-		// Group scenarios by canvasId
+		// Group scenarios by simulationId
 		const map = new Map<string, Scenario[]>()
 		for (const scenario of rows) {
-			if (!map.has(scenario.canvasId)) {
-				map.set(scenario.canvasId, [])
+			if (!map.has(scenario.simulationId)) {
+				map.set(scenario.simulationId, [])
 			}
-			map.get(scenario.canvasId)?.push(scenario)
+			map.get(scenario.simulationId)?.push(scenario)
 		}
 
-		return canvasIds.map((id) => map.get(id) ?? [])
+		return simulationIds.map((id) => map.get(id) ?? [])
 	})
 }
 

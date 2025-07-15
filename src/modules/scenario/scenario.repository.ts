@@ -5,11 +5,14 @@ import { type Scenario, scenarios } from "./scenario.model"
 export class ScenarioRepository {
 	constructor(readonly client: DbClient) {}
 
-	async create(input: { name: string; canvasId: string }): Promise<Scenario> {
+	async create(input: {
+		name: string
+		simulationId: string
+	}): Promise<Scenario> {
 		const scenario = await this.client.transaction(async (tx) => {
 			// lock the scenario
 			await tx.execute(
-				sql`SELECT 1 FROM ${scenarios} WHERE ${scenarios.canvasId} = ${input.canvasId} FOR UPDATE`,
+				sql`SELECT 1 FROM ${scenarios} WHERE ${scenarios.simulationId} = ${input.simulationId} FOR UPDATE`,
 			)
 			// get the current max position for the canvas
 			const maxPosition = await tx
@@ -17,7 +20,7 @@ export class ScenarioRepository {
 					max: sql<number>`MAX(${scenarios.position}) `,
 				})
 				.from(scenarios)
-				.where(eq(scenarios.canvasId, input.canvasId))
+				.where(eq(scenarios.simulationId, input.simulationId))
 			const [s] = await tx
 				.insert(scenarios)
 				.values({ ...input, position: (maxPosition[0]?.max ?? 0) + 1 })
@@ -49,20 +52,20 @@ export class ScenarioRepository {
 		return scenarios
 	}
 
-	async findManyByCanvasId(canvasId: string): Promise<Scenario[]> {
+	async findManyByCanvasId(simulationId: string): Promise<Scenario[]> {
 		const scenarios = await this.client.query.scenarios.findMany({
 			where: {
-				canvasId,
+				simulationId,
 			},
 			orderBy: (scenarios) => [asc(scenarios.position)],
 		})
 		return scenarios
 	}
 
-	async findManyByCanvasIds(canvasIds: string[]): Promise<Scenario[]> {
+	async findManyByCanvasIds(simulationIds: string[]): Promise<Scenario[]> {
 		const scenarios = await this.client.query.scenarios.findMany({
 			where: {
-				canvasId: { in: canvasIds },
+				simulationId: { in: simulationIds },
 			},
 			orderBy: (scenarios) => [asc(scenarios.position)],
 		})

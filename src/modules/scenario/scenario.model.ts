@@ -1,13 +1,13 @@
 import { cuid2 } from "drizzle-cuid2/postgres"
 import { integer, pgTable, varchar } from "drizzle-orm/pg-core"
 import { baseFields } from "../../db/fields"
-import { canvases } from "../canvas/canvas.model"
+import { simulations } from "../simulation/simulation.model"
 
 export const scenarios = pgTable("scenarios", {
 	...baseFields,
-	canvasId: cuid2("canvas_id")
+	simulationId: cuid2("simulation_id")
 		.notNull()
-		.references(() => canvases.id),
+		.references(() => simulations.id, { onDelete: "cascade" }),
 	name: varchar("name", { length: 255 }).notNull(),
 	position: integer("position").notNull(),
 })

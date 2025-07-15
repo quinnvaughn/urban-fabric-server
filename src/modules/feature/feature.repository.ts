@@ -1,4 +1,3 @@
-import type { Geometry } from "geojson"
 import type { DbClient } from "../../types/db"
 import { type Feature, type FeatureInsert, features } from "./feature.model"
 
@@ -11,12 +10,7 @@ export class FeatureRepository {
 		})
 	}
 
-	async create(input: {
-		scenarioId: string
-		type: string
-		geometry: Geometry
-		properties: Record<string, unknown>
-	}): Promise<Feature> {
+	async create(input: FeatureInsert): Promise<Feature> {
 		const [feature] = await this.client
 			.insert(features)
 			.values(input)

@@ -3,26 +3,26 @@ import * as schema from "./schema"
 
 export const relations = defineRelations(schema, (r) => ({
 	users: {
-		canvases: r.many.canvases({
+		simulations: r.many.simulations({
 			from: r.users.id,
-			to: r.canvases.userId,
+			to: r.simulations.userId,
 		}),
 	},
-	canvases: {
+	simulations: {
 		author: r.one.users({
-			from: r.canvases.userId,
+			from: r.simulations.userId,
 			to: r.users.id,
 			optional: false,
 		}),
 		scenarios: r.many.scenarios({
-			from: r.canvases.id,
-			to: r.scenarios.canvasId,
+			from: r.simulations.id,
+			to: r.scenarios.simulationId,
 		}),
 	},
 	scenarios: {
-		canvas: r.one.canvases({
-			from: r.scenarios.canvasId,
-			to: r.canvases.id,
+		simulation: r.one.simulations({
+			from: r.scenarios.simulationId,
+			to: r.simulations.id,
 			optional: false,
 		}),
 		features: r.many.features({

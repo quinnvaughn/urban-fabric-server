@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm"
 import { db } from "../../db"
-import { canvases } from "../canvas/canvas.model"
+import { canvases } from "../simulation/simulation.model"
 import { users } from "../user/user.model"
 import { ScenarioRepository } from "./scenario.repository"
 

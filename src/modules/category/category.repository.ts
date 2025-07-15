@@ -1,4 +1,3 @@
-import { eq, inArray } from "drizzle-orm"
 import type { DbClient } from "../../types/db"
 import {
 	type Category,

@@ -1,5 +1,5 @@
 import type { DbClient } from "../../types/db"
-import { users } from "./user.model"
+import { type UserInsert, users } from "./user.model"
 
 export class UserRepository {
 	constructor(readonly client: DbClient) {}
@@ -30,12 +30,7 @@ export class UserRepository {
 		})
 	}
 
-	async createUser(input: {
-		email: string
-		name: string
-		hashedPassword: string
-		role?: string
-	}) {
+	async createUser(input: UserInsert) {
 		return this.client
 			.insert(users)
 			.values({

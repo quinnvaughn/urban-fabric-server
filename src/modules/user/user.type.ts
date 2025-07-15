@@ -6,11 +6,11 @@ builder.objectType("User", {
 		email: t.exposeString("email"),
 		name: t.exposeString("name", { nullable: true }),
 		role: t.exposeString("role"),
-		canvases: t.field({
-			type: ["Canvas"],
+		simulations: t.field({
+			type: ["Simulation"],
 			resolve: async (user, _args, { loaders }) => {
 				if (!user.id) return []
-				return loaders.canvas.byUserId.load(user.id)
+				return loaders.simulation.byUserId.load(user.id)
 			},
 		}),
 	}),

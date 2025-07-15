@@ -1,6 +1,6 @@
 import type { DbClient } from "../../types/db"
-import { CanvasRepository } from "../canvas/canvas.repository"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
+import { CanvasRepository } from "../simulation/simulation.repository"
 import type { Scenario } from "./scenario.model"
 import { ScenarioRepository } from "./scenario.repository"
 

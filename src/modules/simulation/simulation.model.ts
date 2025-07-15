@@ -3,7 +3,7 @@ import { boolean, pgTable, text, varchar } from "drizzle-orm/pg-core"
 import { baseFields } from "../../db/fields"
 import { users } from "../user/user.model"
 
-export const canvases = pgTable("canvases", {
+export const simulations = pgTable("simulations", {
 	...baseFields,
 	userId: cuid2("user_id")
 		.notNull()
@@ -15,5 +15,5 @@ export const canvases = pgTable("canvases", {
 	published: boolean("published").notNull().default(false),
 })
 
-export type Canvas = typeof canvases.$inferSelect
-export type CanvasInsert = typeof canvases.$inferInsert
+export type Simulation = typeof simulations.$inferSelect
+export type SimulationInsert = typeof simulations.$inferInsert

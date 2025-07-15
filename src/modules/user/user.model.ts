@@ -18,4 +18,4 @@ export const sessions = pgTable("sessions", {
 
 export type User = InferSelectModel<typeof users>
 // or for insert type (without required defaults):
-export type NewUser = InferInsertModel<typeof users>
+export type UserInsert = InferInsertModel<typeof users>

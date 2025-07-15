@@ -1,6 +1,6 @@
 import { builder } from "../../graphql/builder"
 
-builder.objectType("Canvas", {
+builder.objectType("Simulation", {
 	fields: (t) => ({
 		id: t.exposeID("id"),
 		name: t.exposeString("name"),

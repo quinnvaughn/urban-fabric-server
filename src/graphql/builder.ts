@@ -3,7 +3,13 @@ import ErrorsPlugin from "@pothos/plugin-errors"
 import SimpleObjectsPlugin from "@pothos/plugin-simple-objects"
 import WithInputPlugin from "@pothos/plugin-with-input"
 import type * as GEOJSON from "geojson"
-import type { Canvas, Category, Feature, Scenario, User } from "../db/schema"
+import type {
+	Category,
+	Feature,
+	Scenario,
+	Simulation,
+	User,
+} from "../db/schema"
 import type { FeatureOption } from "../modules/feature-option/feature-option.model"
 import type { GraphQLContext } from "./context"
 
@@ -31,7 +37,7 @@ export const builder = new SchemaBuilder<{
 	}
 	Objects: {
 		User: User
-		Canvas: Canvas
+		Simulation: Simulation
 		Scenario: Scenario
 		FeatureOption: FeatureOption
 		Category: Category
@@ -45,6 +51,12 @@ export const builder = new SchemaBuilder<{
 	plugins: [SimpleObjectsPlugin, WithInputPlugin, ErrorsPlugin],
 	errors: {
 		directResult: true,
+		defaultResultOptions: {
+			name: ({ fieldName }) => `${capitalize(fieldName)}Response`,
+		},
+		defaultUnionOptions: {
+			name: ({ fieldName }) => `${capitalize(fieldName)}Result`,
+		},
 	},
 	withInput: {
 		typeOptions: {

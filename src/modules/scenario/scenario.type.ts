@@ -7,12 +7,14 @@ builder.objectType("Scenario", {
 		position: t.exposeInt("position"),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
-		canvas: t.field({
-			type: "Canvas",
+		simulation: t.field({
+			type: "Simulation",
 			resolve: async (scenario, _args, { loaders }) => {
-				const canvas = await loaders.canvas.byId.load(scenario.canvasId)
-				if (!canvas) throw new Error("Canvas not found")
-				return canvas
+				const simulation = await loaders.simulation.byId.load(
+					scenario.simulationId,
+				)
+				if (!simulation) throw new Error("Simulation not found")
+				return simulation
 			},
 		}),
 		features: t.field({

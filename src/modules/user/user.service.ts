@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
 import { NotFoundError, UnauthorizedError, ValidationError } from "../error"
+import type { UserInsert } from "./user.model"
 import { UserRepository } from "./user.repository"
 
 export class UserService {
@@ -10,12 +11,9 @@ export class UserService {
 		this.repo = new UserRepository(dbClient)
 	}
 
-	async registerUser(input: {
-		email: string
-		name: string
-		password: string
-		role?: string
-	}) {
+	async registerUser(
+		input: Omit<UserInsert, "hashedPassword"> & { password: string },
+	) {
 		return this.repo.client.transaction(async (tx) => {
 			const repoTx = new UserRepository(tx)
 			const existing = await repoTx.findUserByEmail(input.email)

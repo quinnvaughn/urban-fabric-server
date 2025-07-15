@@ -1,8 +1,8 @@
 import type { Geometry } from "geojson"
 import type { DbClient } from "../../types/db"
-import { CanvasRepository } from "../canvas/canvas.repository"
 import { ForbiddenError, NotFoundError } from "../error/error"
 import { ScenarioRepository } from "../scenario/scenario.repository"
+import { CanvasRepository } from "../simulation/simulation.repository"
 import type { Feature } from "./feature.model"
 import { FeatureRepository } from "./feature.repository"
 

@@ -15,7 +15,6 @@ builder.mutationFields((t) => ({
 		},
 		input: {
 			email: t.input.string({ required: true }),
-			name: t.input.string({ required: true }),
 			password: t.input.string({ required: true }),
 			role: t.input.string({ required: false }),
 		},

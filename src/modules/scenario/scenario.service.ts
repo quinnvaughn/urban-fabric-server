@@ -1,36 +1,36 @@
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
-import { CanvasRepository } from "../simulation/simulation.repository"
+import { SimulationRepository } from "../simulation/simulation.repository"
 import type { Scenario } from "./scenario.model"
 import { ScenarioRepository } from "./scenario.repository"
 
 export class ScenarioService {
 	private readonly repo: ScenarioRepository
-	private readonly canvasRepo: CanvasRepository
+	private readonly simulationRepo: SimulationRepository
 
 	constructor(client: DbClient) {
 		this.repo = new ScenarioRepository(client)
-		this.canvasRepo = new CanvasRepository(client)
+		this.simulationRepo = new SimulationRepository(client)
 	}
 
 	async createScenario(
 		userId: string,
-		input: { name: string; canvasId: string },
+		input: { name: string; simulationId: string },
 	): Promise<Scenario> {
 		if (!input.name.trim()) {
 			throw new ValidationError([{ field: "name", message: "Required" }])
 		}
 
-		const canvas = await this.canvasRepo.findById(input.canvasId)
-		if (!canvas) {
+		const simulation = await this.simulationRepo.findById(input.simulationId)
+		if (!simulation) {
 			throw new NotFoundError("Canvas not found")
 		}
-		if (canvas.userId !== userId) {
-			throw new ForbiddenError("You do not own this canvas")
+		if (simulation.userId !== userId) {
+			throw new ForbiddenError("You do not own this simulation")
 		}
 
 		return await this.repo.create({
-			canvasId: input.canvasId,
+			simulationId: input.simulationId,
 			name: input.name.trim(),
 		})
 	}
@@ -40,9 +40,9 @@ export class ScenarioService {
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
-		const canvas = await this.canvasRepo.findById(scenario.canvasId)
-		if (!canvas || canvas.userId !== userId) {
-			throw new ForbiddenError("You do not own this canvas")
+		const simulation = await this.simulationRepo.findById(scenario.simulationId)
+		if (!simulation || simulation.userId !== userId) {
+			throw new ForbiddenError("You do not own this simulation")
 		}
 		await this.repo.delete(id)
 	}
@@ -52,22 +52,22 @@ export class ScenarioService {
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
-		const canvas = await this.canvasRepo.findById(scenario.canvasId)
-		if (!canvas || canvas.userId !== userId) {
-			throw new ForbiddenError("You do not own this canvas")
+		const simulation = await this.simulationRepo.findById(scenario.simulationId)
+		if (!simulation || simulation.userId !== userId) {
+			throw new ForbiddenError("You do not own this simulation")
 		}
 		return scenario
 	}
 
-	async getScenariosByCanvasId(
+	async getScenariosBySimulationId(
 		userId: string,
-		canvasId: string,
+		simulationId: string,
 	): Promise<Scenario[]> {
-		const canvas = await this.canvasRepo.findById(canvasId)
-		if (!canvas || canvas.userId !== userId) {
-			throw new ForbiddenError("You do not own this canvas")
+		const simulation = await this.simulationRepo.findById(simulationId)
+		if (!simulation || simulation.userId !== userId) {
+			throw new ForbiddenError("You do not own this simulation")
 		}
-		return this.repo.findManyByCanvasId(canvasId)
+		return this.repo.findManyByCanvasId(simulationId)
 	}
 
 	async renameScenario(
@@ -83,9 +83,9 @@ export class ScenarioService {
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
-		const canvas = await this.canvasRepo.findById(scenario.canvasId)
-		if (!canvas || canvas.userId !== userId) {
-			throw new ForbiddenError("You do not own this canvas")
+		const simulation = await this.simulationRepo.findById(scenario.simulationId)
+		if (!simulation || simulation.userId !== userId) {
+			throw new ForbiddenError("You do not own this simulation")
 		}
 
 		return this.repo.rename(input.id, trimmedName)

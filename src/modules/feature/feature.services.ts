@@ -1,38 +1,29 @@
-import type { Geometry } from "geojson"
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError } from "../error/error"
 import { ScenarioRepository } from "../scenario/scenario.repository"
-import { CanvasRepository } from "../simulation/simulation.repository"
-import type { Feature } from "./feature.model"
+import { SimulationRepository } from "../simulation/simulation.repository"
+import type { Feature, FeatureInsert } from "./feature.model"
 import { FeatureRepository } from "./feature.repository"
 
 export class FeatureService {
 	private readonly repo: FeatureRepository
 	private readonly scenarioRepo: ScenarioRepository
-	private readonly canvasRepo: CanvasRepository
+	private readonly simulationRepo: SimulationRepository
 
 	constructor(client: DbClient) {
 		this.repo = new FeatureRepository(client)
 		this.scenarioRepo = new ScenarioRepository(client)
-		this.canvasRepo = new CanvasRepository(client)
+		this.simulationRepo = new SimulationRepository(client)
 	}
 
-	async create(
-		userId: string,
-		input: {
-			scenarioId: string
-			type: string
-			geometry: Geometry
-			properties: Record<string, unknown>
-		},
-	): Promise<Feature> {
+	async create(userId: string, input: FeatureInsert): Promise<Feature> {
 		const scenario = await this.scenarioRepo.findById(input.scenarioId)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
 
-		const canvas = await this.canvasRepo.findById(scenario.canvasId)
-		if (!canvas || canvas.userId !== userId) {
+		const simulation = await this.simulationRepo.findById(scenario.simulationId)
+		if (!simulation || simulation.userId !== userId) {
 			throw new ForbiddenError("You do not own this scenario")
 		}
 
@@ -47,23 +38,14 @@ export class FeatureService {
 		return feature
 	}
 
-	async upsert(
-		userId: string,
-		input: {
-			id?: string
-			scenarioId: string
-			optionId: string
-			geometry: Geometry
-			properties: Record<string, unknown>
-		},
-	): Promise<Feature> {
+	async upsert(userId: string, input: FeatureInsert): Promise<Feature> {
 		const scenario = await this.scenarioRepo.findById(input.scenarioId)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
 
-		const canvas = await this.canvasRepo.findById(scenario.canvasId)
-		if (!canvas || canvas.userId !== userId) {
+		const simulation = await this.simulationRepo.findById(scenario.simulationId)
+		if (!simulation || simulation.userId !== userId) {
 			throw new ForbiddenError("You do not own this scenario")
 		}
 

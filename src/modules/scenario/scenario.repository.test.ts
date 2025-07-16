@@ -1,18 +1,18 @@
 import { sql } from "drizzle-orm"
 import { db } from "../../db"
-import { canvases } from "../simulation/simulation.model"
+import { simulations } from "../simulation/simulation.model"
 import { users } from "../user/user.model"
 import { ScenarioRepository } from "./scenario.repository"
 
 describe("Scenario Repository", () => {
 	let userId: string
-	let canvasId: string
+	let simulationId: string
 	beforeEach(async () => {
 		vi.resetAllMocks()
 
 		try {
 			await db.execute(
-				sql`TRUNCATE TABLE "scenarios", "canvases", "users" RESTART IDENTITY CASCADE;`,
+				sql`TRUNCATE TABLE "scenarios", "simulations", "users" RESTART IDENTITY CASCADE;`,
 			)
 			const [user] = await db
 				.insert(users)
@@ -24,15 +24,15 @@ describe("Scenario Repository", () => {
 				.returning()
 			userId = user.id
 
-			const [canvas] = await db
-				.insert(canvases)
+			const [simulation] = await db
+				.insert(simulations)
 				.values({
 					name: "Test Canvas",
 					userId: userId,
 				})
 				.returning()
 
-			canvasId = canvas.id
+			simulationId = simulation.id
 		} catch (err) {
 			console.error("Failed to reset DB before test:", err)
 			throw err
@@ -47,18 +47,18 @@ describe("Scenario Repository", () => {
 		const repo = new ScenarioRepository(db)
 		const scenario = await repo.create({
 			name: "Test Scenario",
-			canvasId,
+			simulationId,
 		})
 
 		expect(scenario).toHaveProperty("id")
 		expect(scenario.name).toBe("Test Scenario")
-		expect(scenario.canvasId).toBe(canvasId)
+		expect(scenario.simulationId).toBe(simulationId)
 	})
 	it("assigns position=1 for first scenario", async () => {
 		const repo = new ScenarioRepository(db)
 		const scenario = await repo.create({
 			name: "Test Scenario",
-			canvasId,
+			simulationId,
 		})
 
 		expect(scenario.position).toBe(1)
@@ -66,27 +66,27 @@ describe("Scenario Repository", () => {
 	it("assigns incremented position for additional scenarios", async () => {
 		const repo = new ScenarioRepository(db)
 
-		await repo.create({ name: "First", canvasId })
-		const second = await repo.create({ name: "Second", canvasId })
+		await repo.create({ name: "First", simulationId })
+		const second = await repo.create({ name: "Second", simulationId })
 
 		expect(second.position).toBe(2)
 	})
-	it("resets position per canvas", async () => {
+	it("resets position per simulation", async () => {
 		const repo = new ScenarioRepository(db)
 
-		// canvas A
-		await repo.create({ name: "A1", canvasId })
-		await repo.create({ name: "A2", canvasId })
+		// simulation A
+		await repo.create({ name: "A1", simulationId })
+		await repo.create({ name: "A2", simulationId })
 
-		// canvas B
-		const [canvasB] = await db
-			.insert(canvases)
-			.values({ name: "Canvas B", userId })
+		// simulation B
+		const [simulationB] = await db
+			.insert(simulations)
+			.values({ name: "Simulation B", userId })
 			.returning()
 
 		const scenarioB = await repo.create({
 			name: "B1",
-			canvasId: canvasB.id,
+			simulationId: simulationB.id,
 		})
 
 		expect(scenarioB.position).toBe(1)
@@ -96,7 +96,7 @@ describe("Scenario Repository", () => {
 
 		const scenario = await repo.create({
 			name: "Test Scenario",
-			canvasId,
+			simulationId,
 		})
 		await repo.delete(scenario.id)
 		expect(await repo.findById(scenario.id)).toBeNull()

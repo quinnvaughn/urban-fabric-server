@@ -52,7 +52,7 @@ export class ScenarioRepository {
 		return scenarios
 	}
 
-	async findManyByCanvasId(simulationId: string): Promise<Scenario[]> {
+	async findManyBySimulationId(simulationId: string): Promise<Scenario[]> {
 		const scenarios = await this.client.query.scenarios.findMany({
 			where: {
 				simulationId,
@@ -62,7 +62,7 @@ export class ScenarioRepository {
 		return scenarios
 	}
 
-	async findManyByCanvasIds(simulationIds: string[]): Promise<Scenario[]> {
+	async findManyBySimulationIds(simulationIds: string[]): Promise<Scenario[]> {
 		const scenarios = await this.client.query.scenarios.findMany({
 			where: {
 				simulationId: { in: simulationIds },

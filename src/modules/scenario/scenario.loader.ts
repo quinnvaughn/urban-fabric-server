@@ -13,12 +13,12 @@ function createScenarioLoader(repo: ScenarioRepository) {
 	})
 }
 
-function createScenariosByCanvasIdLoader(repo: ScenarioRepository) {
+function createScenariosBySimulationIdLoader(repo: ScenarioRepository) {
 	return new DataLoader<
 		string,
-		Awaited<ReturnType<typeof repo.findManyByCanvasId>> | null
+		Awaited<ReturnType<typeof repo.findManyBySimulationId>> | null
 	>(async (simulationIds: readonly string[]) => {
-		const rows = await repo.findManyByCanvasIds([...simulationIds])
+		const rows = await repo.findManyBySimulationIds([...simulationIds])
 
 		// Group scenarios by simulationId
 		const map = new Map<string, Scenario[]>()
@@ -35,5 +35,5 @@ function createScenariosByCanvasIdLoader(repo: ScenarioRepository) {
 
 export const scenarioLoaders = (repo: ScenarioRepository) => ({
 	byId: createScenarioLoader(repo),
-	byCanvasId: createScenariosByCanvasIdLoader(repo),
+	bySimulationId: createScenariosBySimulationIdLoader(repo),
 })

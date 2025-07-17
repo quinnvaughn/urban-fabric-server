@@ -7,20 +7,20 @@ builder.objectType("Simulation", {
 		description: t.exposeString("description", { nullable: true }),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
-		slug: t.exposeString("slug", { nullable: true }),
-		published: t.exposeBoolean("published"),
 		author: t.field({
 			type: "User",
-			resolve: async (canvas, _args, { loaders }) => {
-				const author = await loaders.user.load(canvas.userId)
+			resolve: async (simulation, _args, { loaders }) => {
+				const author = await loaders.user.load(simulation.userId)
 				if (!author) throw new Error("Author not found")
 				return author
 			},
 		}),
 		scenarios: t.field({
 			type: ["Scenario"],
-			resolve: async (canvas, _args, { loaders }) => {
-				const scenarios = await loaders.scenario.byCanvasId.load(canvas.id)
+			resolve: async (simulation, _args, { loaders }) => {
+				const scenarios = await loaders.scenario.bySimulationId.load(
+					simulation.id,
+				)
 				if (!scenarios) throw new Error("Scenarios not found")
 				return scenarios
 			},

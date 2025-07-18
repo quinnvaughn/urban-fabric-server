@@ -67,7 +67,7 @@ export class ScenarioService {
 		if (!simulation || simulation.userId !== userId) {
 			throw new ForbiddenError("You do not own this simulation")
 		}
-		return this.repo.findManyByCanvasId(simulationId)
+		return this.repo.findManyBySimulationId(simulationId)
 	}
 
 	async renameScenario(

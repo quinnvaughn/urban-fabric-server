@@ -1,36 +1,36 @@
 import { match } from "ts-pattern"
 import { builder } from "../../graphql/builder"
-import type { Feature as FeatureRow } from "./feature.model"
+import type { LayerInstance as LayerInstanceRow } from "./layer-instance.model"
 
-abstract class Feature implements FeatureRow {
+abstract class LayerInstance implements LayerInstanceRow {
 	id!: string
 	createdAt!: Date
 	updatedAt!: Date
 	scenarioId!: string
 	geometry!: GeoJSON.Geometry
-	optionId!: string
+	templateId!: string
 	// biome-ignore lint/suspicious/noExplicitAny: We need to allow any here for flexibility
 	properties!: Record<string, any>
 }
 
-builder.interfaceType("Feature", {
+builder.interfaceType("LayerInstance", {
 	fields: (t) => ({
 		id: t.exposeID("id"),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 		geometry: t.field({
 			type: "GeoJSON",
-			resolve: (feature) => feature.geometry as GeoJSON.Geometry,
+			resolve: (layerInstance) => layerInstance.geometry as GeoJSON.Geometry,
 		}),
 	}),
-	resolveType: (feature) => {
-		return match(feature.optionId)
-			.with("bike_lane", () => "BikeLaneFeature")
-			.otherwise(() => "UnknownFeature")
+	resolveType: (layerInstance) => {
+		return match(layerInstance.templateId)
+			.with("bike_lane", () => "BikeLaneLayerInstance")
+			.otherwise(() => "UnknownLayerInstance")
 	},
 })
 
-class BikeLaneFeature extends Feature {
+class BikeLaneLayerInstance extends LayerInstance {
 	properties!: {
 		width: number
 		buffer: string
@@ -42,9 +42,9 @@ class BikeLaneFeature extends Feature {
 	}
 }
 
-builder.objectType(BikeLaneFeature, {
-	name: "BikeLaneFeature",
-	interfaces: ["Feature"],
+builder.objectType(BikeLaneLayerInstance, {
+	name: "BikeLaneLayerInstance",
+	interfaces: ["LayerInstance"],
 	fields: (t) => ({
 		id: t.exposeID("id"),
 		createdAt: t.field({ type: "DateTime", resolve: (f) => f.createdAt }),
@@ -66,17 +66,21 @@ builder.objectType(BikeLaneFeature, {
 		}),
 		scenario: t.field({
 			type: "Scenario",
-			resolve: async (feature, _args, { loaders }) => {
-				const scenario = await loaders.scenario.byId.load(feature.scenarioId)
+			resolve: async (layerInstance, _args, { loaders }) => {
+				const scenario = await loaders.scenario.byId.load(
+					layerInstance.scenarioId,
+				)
 				if (!scenario) throw new Error("Scenario not found")
 				return scenario
 			},
 		}),
 		option: t.field({
-			type: "FeatureOption",
-			resolve: async (feature, _args, { loaders }) => {
-				const option = await loaders.featureOption.byId.load(feature.optionId)
-				if (!option) throw new Error("Feature option not found")
+			type: "LayerTemplate",
+			resolve: async (layerInstance, _args, { loaders }) => {
+				const option = await loaders.layerTemplate.byId.load(
+					layerInstance.templateId,
+				)
+				if (!option) throw new Error("LayerInstance option not found")
 				return option
 			},
 		}),

@@ -44,31 +44,6 @@ export class SimulationRepository {
 		return simulation ?? null
 	}
 
-	async publish(id: string): Promise<string> {
-		return this.client.transaction(async (tx) => {
-			const repoTx = new SimulationRepository(tx)
-
-			const canvas = await repoTx.findById(id)
-			if (!canvas) throw new Error("Simulation not found")
-
-			const base = slugify(canvas.name, { lower: true, strict: true })
-			let slug = base
-			let suffix = 1
-
-			// loop inside transaction to ensure uniqueness
-			while (await tx.query.simulations.findFirst({ where: { slug } })) {
-				slug = `${base}-${suffix++}`
-			}
-
-			await tx
-				.update(simulations)
-				.set({ slug, published: true, updatedAt: new Date() })
-				.where(eq(simulations.id, id))
-
-			return slug
-		})
-	}
-
 	async findByUserId(userId: string): Promise<Simulation[]> {
 		const simulations = await this.client.query.simulations.findMany({
 			where: { userId },

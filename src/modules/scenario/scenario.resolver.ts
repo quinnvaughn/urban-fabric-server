@@ -14,7 +14,7 @@ builder.mutationFields((t) => ({
 		},
 		input: {
 			name: t.input.string({ required: true }),
-			canvasId: t.input.id({ required: true }),
+			simulationId: t.input.id({ required: true }),
 		},
 		resolve: async (_parent, { input }, { services, user }) => {
 			if (!user) {

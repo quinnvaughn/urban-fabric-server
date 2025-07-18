@@ -6,10 +6,10 @@ builder.objectType("Category", {
 		icon: t.exposeString("icon", { nullable: true }),
 		label: t.exposeString("label"),
 		order: t.exposeInt("order", { nullable: true }),
-		featureOptions: t.field({
-			type: ["FeatureOption"],
+		layerTemplates: t.field({
+			type: ["LayerTemplate"],
 			resolve: (category, _args, { loaders }) => {
-				return loaders.featureOption.byCategoryIds.load(category.id)
+				return loaders.layerTemplate.byCategoryIds.load(category.id)
 			},
 		}),
 	}),

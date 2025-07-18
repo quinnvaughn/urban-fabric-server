@@ -1,18 +1,18 @@
 import DataLoader from "dataloader"
-import type { FeatureOption } from "./feature-option.model"
-import type { FeatureOptionRepository } from "./feature-option.repository"
+import type { LayerTemplate } from "./layer-template.model"
+import type { LayerTemplateRepository } from "./layer-template.repository"
 
-export function featureOptionLoaders(repo: FeatureOptionRepository) {
+export function layerTemplateLoaders(repo: LayerTemplateRepository) {
 	return {
-		byId: new DataLoader<string, FeatureOption | null>(async (ids) => {
+		byId: new DataLoader<string, LayerTemplate | null>(async (ids) => {
 			const rows = await repo.findByIds(ids as string[])
 			const lookup = new Map(rows.map((row) => [row.id, row]))
 			return ids.map((id) => lookup.get(id) ?? null)
 		}),
-		byCategoryIds: new DataLoader<string, FeatureOption[]>(
+		byCategoryIds: new DataLoader<string, LayerTemplate[]>(
 			async (categoryIds) => {
 				const rows = await repo.findByCategoryIds(categoryIds as string[])
-				const lookup = new Map<string, FeatureOption[]>()
+				const lookup = new Map<string, LayerTemplate[]>()
 				for (const row of rows) {
 					if (!lookup.has(row.categoryId)) {
 						lookup.set(row.categoryId, [])

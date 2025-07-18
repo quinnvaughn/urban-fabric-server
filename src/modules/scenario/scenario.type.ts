@@ -17,10 +17,10 @@ builder.objectType("Scenario", {
 				return simulation
 			},
 		}),
-		features: t.field({
-			type: ["Feature"],
+		layerInstances: t.field({
+			type: ["LayerInstance"],
 			resolve: async (scenario, _args, { loaders }) => {
-				return await loaders.feature.byScenarioId.load(scenario.id)
+				return await loaders.layerInstance.byScenarioId.load(scenario.id)
 			},
 		}),
 	}),

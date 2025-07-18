@@ -5,12 +5,12 @@ import WithInputPlugin from "@pothos/plugin-with-input"
 import type * as GEOJSON from "geojson"
 import type {
 	Category,
-	Feature,
+	LayerInstance,
 	Scenario,
 	Simulation,
 	User,
 } from "../db/schema"
-import type { FeatureOption } from "../modules/feature-option/feature-option.model"
+import type { LayerTemplate } from "../modules/layer-template/layer-template.model"
 import type { GraphQLContext } from "./context"
 
 function capitalize(str: string): string {
@@ -39,11 +39,11 @@ export const builder = new SchemaBuilder<{
 		User: User
 		Simulation: Simulation
 		Scenario: Scenario
-		FeatureOption: FeatureOption
+		LayerTemplate: LayerTemplate
 		Category: Category
 	}
 	Interfaces: {
-		Feature: Feature
+		LayerInstance: LayerInstance
 	}
 }>({
 	defaultInputFieldRequiredness: true,

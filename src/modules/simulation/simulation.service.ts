@@ -63,12 +63,4 @@ export class SimulationService {
 		await this.getSimulation(id, userId)
 		await this.repo.delete(id)
 	}
-
-	async publishSimulation(id: string, userId: string): Promise<string> {
-		const simulation = await this.getSimulation(id, userId)
-		if (simulation.published) {
-			throw new ConflictError("Simulation is already published")
-		}
-		return this.repo.publish(id)
-	}
 }

@@ -1,8 +1,8 @@
 import { db } from "../db"
-import type { FeatureOptionInsert } from "../db/schema"
-import { FeatureOptionRepository } from "../modules/feature-option/feature-option.repository"
+import type { LayerTemplateInsert } from "../db/schema"
+import { LayerTemplateRepository } from "../modules/layer-template/layer-template.repository"
 
-const DEFAULT_SCENARIO_FEATURE_OPTIONS: FeatureOptionInsert[] = [
+const DEFAULT_SCENARIO_LAYER_TEMPLATES: LayerTemplateInsert[] = [
 	{
 		id: "bike_lane",
 		label: "Bike Lane",
@@ -49,7 +49,7 @@ const DEFAULT_SCENARIO_FEATURE_OPTIONS: FeatureOptionInsert[] = [
 			connectsTo: {
 				type: "string",
 				list: true,
-				label: "Connected Feature IDs",
+				label: "Connected LayerInstance IDs",
 				default: [],
 			},
 			oneWay: {
@@ -61,11 +61,11 @@ const DEFAULT_SCENARIO_FEATURE_OPTIONS: FeatureOptionInsert[] = [
 	},
 ]
 
-export async function seedFeatureOptions() {
-	const repo = new FeatureOptionRepository(db)
+export async function seedLayerTemplates() {
+	const repo = new LayerTemplateRepository(db)
 
-	for (const option of DEFAULT_SCENARIO_FEATURE_OPTIONS) {
+	for (const option of DEFAULT_SCENARIO_LAYER_TEMPLATES) {
 		await repo.upsert(option)
 	}
-	console.log("✅ Seeded scenario feature options")
+	console.log("✅ Seeded scenario layer templates")
 }

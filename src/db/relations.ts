@@ -25,38 +25,38 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.simulations.id,
 			optional: false,
 		}),
-		features: r.many.features({
+		layerInstances: r.many.layerInstances({
 			from: r.scenarios.id,
-			to: r.features.scenarioId,
+			to: r.layerInstances.scenarioId,
 		}),
 	},
-	features: {
+	layerInstances: {
 		scenario: r.one.scenarios({
-			from: r.features.scenarioId,
+			from: r.layerInstances.scenarioId,
 			to: r.scenarios.id,
 			optional: false,
 		}),
-		option: r.one.featureOptions({
-			from: r.features.optionId,
-			to: r.featureOptions.id,
+		option: r.one.layerTemplates({
+			from: r.layerInstances.templateId,
+			to: r.layerTemplates.id,
 			optional: true,
 		}),
 	},
-	featureOptions: {
+	layerTemplates: {
 		category: r.one.categories({
-			from: r.featureOptions.categoryId,
+			from: r.layerTemplates.categoryId,
 			to: r.categories.id,
 			optional: true,
 		}),
-		features: r.many.features({
-			from: r.featureOptions.id,
-			to: r.features.optionId,
+		layerInstances: r.many.layerInstances({
+			from: r.layerTemplates.id,
+			to: r.layerInstances.templateId,
 		}),
 	},
 	categories: {
-		featureOptions: r.many.featureOptions({
+		layerTemplates: r.many.layerTemplates({
 			from: r.categories.id,
-			to: r.featureOptions.categoryId,
+			to: r.layerTemplates.categoryId,
 		}),
 	},
 }))

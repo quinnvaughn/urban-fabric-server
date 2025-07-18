@@ -1,9 +1,9 @@
 import { seedCategories } from "./categories"
-import { seedFeatureOptions } from "./feature-options"
+import { seedLayerTemplates } from "./layer-templates"
 
 async function main() {
 	await seedCategories()
-	await seedFeatureOptions()
+	await seedLayerTemplates()
 }
 
 main()

@@ -1,6 +1,6 @@
 import { CategoryService } from "../modules/category/category.service"
-import { FeatureService } from "../modules/feature/feature.services"
-import { FeatureOptionService } from "../modules/feature-option/feature-option.service"
+import { LayerInstanceService } from "../modules/layer-instance/layer-instance.services"
+import { LayerTemplateService } from "../modules/layer-template/layer-template.service"
 import { ScenarioService } from "../modules/scenario/scenario.service"
 import { SimulationService } from "../modules/simulation/simulation.service"
 import { UserService } from "../modules/user/user.service"
@@ -11,8 +11,8 @@ export function createServices(db: DbClient) {
 		user: new UserService(db),
 		simulation: new SimulationService(db),
 		scenario: new ScenarioService(db),
-		feature: new FeatureService(db),
-		featureOption: new FeatureOptionService(db),
+		layerInstance: new LayerInstanceService(db),
+		layerTemplate: new LayerTemplateService(db),
 		category: new CategoryService(db),
 	}
 }

@@ -2,21 +2,24 @@ import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError } from "../error/error"
 import { ScenarioRepository } from "../scenario/scenario.repository"
 import { SimulationRepository } from "../simulation/simulation.repository"
-import type { Feature, FeatureInsert } from "./feature.model"
-import { FeatureRepository } from "./feature.repository"
+import type { LayerInstance, LayerInstanceInsert } from "./layer-instance.model"
+import { LayerInstanceRepository } from "./layer-instance.repository"
 
-export class FeatureService {
-	private readonly repo: FeatureRepository
+export class LayerInstanceService {
+	private readonly repo: LayerInstanceRepository
 	private readonly scenarioRepo: ScenarioRepository
 	private readonly simulationRepo: SimulationRepository
 
 	constructor(client: DbClient) {
-		this.repo = new FeatureRepository(client)
+		this.repo = new LayerInstanceRepository(client)
 		this.scenarioRepo = new ScenarioRepository(client)
 		this.simulationRepo = new SimulationRepository(client)
 	}
 
-	async create(userId: string, input: FeatureInsert): Promise<Feature> {
+	async create(
+		userId: string,
+		input: LayerInstanceInsert,
+	): Promise<LayerInstance> {
 		const scenario = await this.scenarioRepo.findById(input.scenarioId)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
@@ -30,15 +33,18 @@ export class FeatureService {
 		return this.repo.create(input)
 	}
 
-	async findById(id: string): Promise<Feature | null> {
-		const feature = await this.repo.findById(id)
-		if (!feature) {
-			throw new NotFoundError("Feature not found")
+	async findById(id: string): Promise<LayerInstance | null> {
+		const layerInstance = await this.repo.findById(id)
+		if (!layerInstance) {
+			throw new NotFoundError("LayerInstance not found")
 		}
-		return feature
+		return layerInstance
 	}
 
-	async upsert(userId: string, input: FeatureInsert): Promise<Feature> {
+	async upsert(
+		userId: string,
+		input: LayerInstanceInsert,
+	): Promise<LayerInstance> {
 		const scenario = await this.scenarioRepo.findById(input.scenarioId)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
@@ -52,7 +58,7 @@ export class FeatureService {
 		if (input.id) {
 			const existing = await this.repo.findById(input.id)
 			if (!existing || existing.scenarioId !== input.scenarioId) {
-				throw new ForbiddenError("You cannot update this feature")
+				throw new ForbiddenError("You cannot update this layerInstance")
 			}
 		}
 

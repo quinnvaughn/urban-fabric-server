@@ -1,10 +1,5 @@
 import type { DbClient } from "../../types/db"
-import {
-	ConflictError,
-	ForbiddenError,
-	NotFoundError,
-	ValidationError,
-} from "../error"
+import { ForbiddenError, NotFoundError, ValidationError } from "../error"
 import { ScenarioRepository } from "../scenario/scenario.repository"
 import type { Simulation } from "./simulation.model"
 import { SimulationRepository } from "./simulation.repository"

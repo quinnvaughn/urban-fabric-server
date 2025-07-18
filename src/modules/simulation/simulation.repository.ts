@@ -1,5 +1,4 @@
 import { eq } from "drizzle-orm"
-import slugify from "slugify"
 import type { DbClient } from "../../types/db"
 import { type Simulation, simulations } from "./simulation.model"
 

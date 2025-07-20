@@ -17,8 +17,11 @@ builder.objectType("LayerTemplate", {
 		}),
 		propertiesSchema: t.field({
 			type: "JSON",
-			// biome-ignore lint/suspicious/noExplicitAny: We need to allow any here for flexibility
 			resolve: (layerTemplate) => layerTemplate.propertiesSchema as any,
+		}),
+		interactionConfig: t.field({
+			type: "JSON",
+			resolve: (layerTemplate) => layerTemplate.interactionConfig as any,
 		}),
 	}),
 })

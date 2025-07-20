@@ -63,14 +63,7 @@ export class LayerTemplateRepository {
 			.values(input)
 			.onConflictDoUpdate({
 				target: layerTemplates.id,
-				set: {
-					label: input.label,
-					categoryId: input.categoryId,
-					geometryType: input.geometryType,
-					description: input.description,
-					icon: input.icon,
-					propertiesSchema: input.propertiesSchema,
-				},
+				set: input,
 			})
 			.returning()
 		return row

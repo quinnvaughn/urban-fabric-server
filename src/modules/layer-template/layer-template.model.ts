@@ -11,6 +11,7 @@ export const layerTemplates = pgTable("layer_templates", {
 		.references(() => categories.id),
 	geometryType: geometryTypeEnum("geometry_type").notNull(), // Point, LineString, etc
 	propertiesSchema: jsonb("properties_schema"), // JSON schema for properties ie {"width": {"type": "number", "default": 2.0}}
+	interactionConfig: jsonb("interaction_config").default({}), // JSON config for interaction, defaults to empty object
 	icon: varchar("icon", { length: 64 }), // optional icon name
 })
 

@@ -14,11 +14,7 @@ export class CategoryRepository {
 			.values(input)
 			.onConflictDoUpdate({
 				target: categories.id,
-				set: {
-					label: input.label,
-					icon: input.icon,
-					order: input.order,
-				},
+				set: input,
 			})
 			.returning()
 		return row

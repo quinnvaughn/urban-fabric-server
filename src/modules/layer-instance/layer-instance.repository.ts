@@ -36,12 +36,7 @@ export class LayerInstanceRepository {
 			.values(input)
 			.onConflictDoUpdate({
 				target: layerInstances.id,
-				set: {
-					scenarioId: input.scenarioId,
-					templateId: input.templateId,
-					geometry: input.geometry,
-					properties: input.properties,
-				},
+				set: input,
 			})
 			.returning()
 

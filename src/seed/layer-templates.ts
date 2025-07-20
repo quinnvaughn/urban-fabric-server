@@ -10,6 +10,7 @@ const DEFAULT_SCENARIO_LAYER_TEMPLATES: LayerTemplateInsert[] = [
 			"Adds a bike lane to the road, configurable by type and width.",
 		categoryId: "streets",
 		geometryType: "LineString",
+		icon: "Bicycle",
 		propertiesSchema: {
 			type: {
 				type: "enum",
@@ -56,6 +57,21 @@ const DEFAULT_SCENARIO_LAYER_TEMPLATES: LayerTemplateInsert[] = [
 				type: "boolean",
 				label: "One-Way Lane",
 				default: true,
+			},
+		},
+		interactionConfig: {
+			toolType: "draw",
+			defaultCursor: "crosshair",
+			validCursor: "pointer",
+			invalidCursor: "not-allowed",
+			validTargetLayers: ["road-centerline"],
+			hoverStyle: {
+				"line-color": "#0af",
+				"line-width": 4,
+			},
+			activeStyle: {
+				"line-color": "#07a",
+				"line-width": 6,
 			},
 		},
 	},

@@ -1,5 +1,5 @@
 import { cuid2 } from "drizzle-cuid2/postgres"
-import { pgTable, text, varchar } from "drizzle-orm/pg-core"
+import { pgTable, varchar } from "drizzle-orm/pg-core"
 import { baseFields } from "../../db/fields"
 import { users } from "../user/user.model"
 
@@ -9,7 +9,6 @@ export const simulations = pgTable("simulations", {
 		.notNull()
 		.references(() => users.id),
 	name: varchar("name", { length: 255 }).notNull(),
-	description: text("description"),
 	// TODO: narrativeId: cuid2("narrative_id")
 })
 

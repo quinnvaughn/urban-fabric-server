@@ -27,7 +27,7 @@ describe("Scenario Repository", () => {
 			const [simulation] = await db
 				.insert(simulations)
 				.values({
-					name: "Test Canvas",
+					name: "Test Simulation",
 					userId: userId,
 				})
 				.returning()

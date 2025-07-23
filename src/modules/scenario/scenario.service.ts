@@ -1,6 +1,7 @@
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
 import { SimulationRepository } from "../simulation/simulation.repository"
+import { SimulationStateService } from "../simulation-state/simulation-state.service"
 import type { Scenario } from "./scenario.model"
 import { ScenarioRepository } from "./scenario.repository"
 
@@ -13,29 +14,41 @@ export class ScenarioService {
 		this.simulationRepo = new SimulationRepository(client)
 	}
 
-	async createScenario(
-		userId: string,
-		input: { name: string; simulationId: string },
-	): Promise<Scenario> {
-		if (!input.name.trim()) {
+	async createScenario(input: {
+		name: string
+		simulationId: string
+		userId: string
+	}): Promise<Scenario> {
+		const { name, simulationId, userId } = input
+		if (!name.trim()) {
 			throw new ValidationError([{ field: "name", message: "Required" }])
 		}
 
-		const simulation = await this.simulationRepo.findById(input.simulationId)
+		const simulation = await this.simulationRepo.findById(simulationId)
 		if (!simulation) {
-			throw new NotFoundError("Canvas not found")
+			throw new NotFoundError("Simulation not found")
 		}
 		if (simulation.userId !== userId) {
 			throw new ForbiddenError("You do not own this simulation")
 		}
 
-		return await this.repo.create({
-			simulationId: input.simulationId,
-			name: input.name.trim(),
+		return await this.repo.client.transaction(async (tx) => {
+			const simulationStateService = new SimulationStateService(tx)
+			const repo = new ScenarioRepository(tx)
+			const scenario = await repo.create({
+				simulationId,
+				name: name.trim(),
+			})
+			await simulationStateService.createState(userId, {
+				simulationId,
+				scenarioId: scenario.id,
+			})
+			return scenario
 		})
 	}
 
-	async deleteScenario(userId: string, id: string): Promise<void> {
+	async deleteScenario(input: { userId: string; id: string }): Promise<void> {
+		const { userId, id } = input
 		const scenario = await this.repo.findById(id)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
@@ -47,7 +60,8 @@ export class ScenarioService {
 		await this.repo.delete(id)
 	}
 
-	async getScenario(userId: string, id: string): Promise<Scenario> {
+	async getScenario(input: { userId: string; id: string }): Promise<Scenario> {
+		const { userId, id } = input
 		const scenario = await this.repo.findById(id)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
@@ -59,10 +73,11 @@ export class ScenarioService {
 		return scenario
 	}
 
-	async getScenariosBySimulationId(
-		userId: string,
-		simulationId: string,
-	): Promise<Scenario[]> {
+	async getScenariosBySimulationId(input: {
+		userId: string
+		simulationId: string
+	}): Promise<Scenario[]> {
+		const { userId, simulationId } = input
 		const simulation = await this.simulationRepo.findById(simulationId)
 		if (!simulation || simulation.userId !== userId) {
 			throw new ForbiddenError("You do not own this simulation")
@@ -70,16 +85,18 @@ export class ScenarioService {
 		return this.repo.findManyBySimulationId(simulationId)
 	}
 
-	async renameScenario(
-		userId: string,
-		input: { id: string; name: string },
-	): Promise<Scenario> {
-		const trimmedName = input.name.trim()
+	async renameScenario(input: {
+		id: string
+		name: string
+		userId: string
+	}): Promise<Scenario> {
+		const { id, name, userId } = input
+		const trimmedName = name.trim()
 		if (!trimmedName) {
 			throw new ValidationError([{ field: "name", message: "Required" }])
 		}
 
-		const scenario = await this.repo.findById(input.id)
+		const scenario = await this.repo.findById(id)
 		if (!scenario) {
 			throw new NotFoundError("Scenario not found")
 		}
@@ -88,6 +105,6 @@ export class ScenarioService {
 			throw new ForbiddenError("You do not own this simulation")
 		}
 
-		return this.repo.rename(input.id, trimmedName)
+		return this.repo.rename({ id, name: trimmedName })
 	}
 }

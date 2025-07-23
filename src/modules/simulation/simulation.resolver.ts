@@ -22,12 +22,10 @@ builder.mutationFields((t) => ({
 					"You must be logged in to create a simulation.",
 				)
 			}
-			const newSimulation = await services.simulation.createSimulation(
-				user.id,
-				{
-					name: input.name.trim(),
-				},
-			)
+			const newSimulation = await services.simulation.createSimulation({
+				userId: user.id,
+				name: input.name.trim(),
+			})
 
 			return { ...newSimulation, __typename: "Simulation" }
 		},
@@ -47,7 +45,7 @@ builder.mutationFields((t) => ({
 					"You must be logged in to delete a simulation.",
 				)
 			}
-			await services.simulation.deleteSimulation(input.id, user.id)
+			await services.simulation.deleteSimulation({ ...input, userId: user.id })
 			return true
 		},
 	}),
@@ -74,7 +72,10 @@ builder.mutationFields((t) => ({
 			await services.simulation.updateSimulation(input.id, user.id, {
 				name: input.name?.trim(),
 			})
-			return await services.simulation.getSimulation(input.id, user.id)
+			return await services.simulation.getSimulation({
+				...input,
+				userId: user.id,
+			})
 		},
 	}),
 }))
@@ -94,7 +95,7 @@ builder.queryFields((t) => ({
 					"You must be logged in to view a simulation.",
 				)
 			}
-			return await services.simulation.getSimulation(id, user.id)
+			return await services.simulation.getSimulation({ id, userId: user.id })
 		},
 	}),
 }))

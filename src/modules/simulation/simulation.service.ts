@@ -1,8 +1,7 @@
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
 import { ScenarioService } from "../scenario/scenario.service"
-import { SimulationStateService } from "../simulation-state/simulation-state.service"
-import type { Simulation } from "./simulation.model"
+import type { Simulation, SimulationInsert } from "./simulation.model"
 import { SimulationRepository } from "./simulation.repository"
 
 export class SimulationService {
@@ -12,28 +11,30 @@ export class SimulationService {
 		this.repo = new SimulationRepository(client)
 	}
 
-	async createSimulation(userId: string, input: { name: string }) {
+	async createSimulation(input: {
+		name: string
+		userId: string
+	}): Promise<Simulation> {
 		return this.repo.client.transaction(async (tx) => {
 			const simulationRepo = new SimulationRepository(tx)
 			const scenarioService = new ScenarioService(tx)
-			const simulationStateService = new SimulationStateService(tx)
 
-			const simulation = await simulationRepo.create(input, userId)
+			const simulation = await simulationRepo.create({ ...input })
 			// add default scenario
-			const scenario = await scenarioService.createScenario(userId, {
+			await scenarioService.createScenario({
+				userId: input.userId,
 				simulationId: simulation.id,
 				name: "Untitled Scenario",
-			})
-			// create initial state
-			await simulationStateService.createState(userId, {
-				simulationId: simulation.id,
-				scenarioId: scenario.id,
 			})
 			return simulation
 		})
 	}
 
-	async getSimulation(id: string, userId: string): Promise<Simulation> {
+	async getSimulation(input: {
+		id: string
+		userId: string
+	}): Promise<Simulation> {
+		const { id, userId } = input
 		const simulation = await this.repo.findById(id)
 		if (!simulation) {
 			throw new NotFoundError(`Simulation with id ${id} not found`)
@@ -49,17 +50,17 @@ export class SimulationService {
 	async updateSimulation(
 		id: string,
 		userId: string,
-		updates: Partial<Omit<Simulation, "id" | "userId" | "createdAt">>,
+		updates: Partial<SimulationInsert>,
 	) {
-		await this.getSimulation(id, userId) // Ensure simulation exists and belongs to user
+		await this.getSimulation({ id, userId }) // Ensure simulation exists and belongs to user
 		if (updates.name !== undefined && !updates.name.trim()) {
 			throw new ValidationError([{ field: "name", message: "Required" }])
 		}
 		await this.repo.update(id, updates)
 	}
 
-	async deleteSimulation(id: string, userId: string): Promise<void> {
-		await this.getSimulation(id, userId)
-		await this.repo.delete(id)
+	async deleteSimulation(input: { id: string; userId: string }): Promise<void> {
+		await this.getSimulation(input) // Ensure simulation exists and belongs to user
+		await this.repo.delete(input.id)
 	}
 }

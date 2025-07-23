@@ -3,6 +3,7 @@ import { LayerInstanceService } from "../modules/layer-instance/layer-instance.s
 import { LayerTemplateService } from "../modules/layer-template/layer-template.service"
 import { ScenarioService } from "../modules/scenario/scenario.service"
 import { SimulationService } from "../modules/simulation/simulation.service"
+import { SimulationStateService } from "../modules/simulation-state/simulation-state.service"
 import { UserService } from "../modules/user/user.service"
 import type { DbClient } from "../types/db"
 
@@ -14,6 +15,7 @@ export function createServices(db: DbClient) {
 		layerInstance: new LayerInstanceService(db),
 		layerTemplate: new LayerTemplateService(db),
 		category: new CategoryService(db),
+		simulationState: new SimulationStateService(db),
 	}
 }
 

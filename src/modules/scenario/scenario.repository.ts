@@ -14,7 +14,7 @@ export class ScenarioRepository {
 			await tx.execute(
 				sql`SELECT 1 FROM ${scenarios} WHERE ${scenarios.simulationId} = ${input.simulationId} FOR UPDATE`,
 			)
-			// get the current max position for the canvas
+			// get the current max position for the simulation
 			const maxPosition = await tx
 				.select({
 					max: sql<number>`MAX(${scenarios.position}) `,
@@ -72,7 +72,8 @@ export class ScenarioRepository {
 		return scenarios
 	}
 
-	async rename(id: string, name: string): Promise<Scenario> {
+	async rename(input: { id: string; name: string }): Promise<Scenario> {
+		const { id, name } = input
 		const scenario = await this.findById(id)
 		if (!scenario) throw new Error("Scenario not found")
 		const [updatedScenario] = await this.client

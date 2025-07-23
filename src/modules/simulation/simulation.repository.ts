@@ -1,21 +1,23 @@
 import { eq } from "drizzle-orm"
 import type { DbClient } from "../../types/db"
-import { type Simulation, simulations } from "./simulation.model"
+import {
+	type Simulation,
+	type SimulationInsert,
+	simulations,
+} from "./simulation.model"
 
 export class SimulationRepository {
 	constructor(readonly client: DbClient) {}
 
-	async create(input: { name: string }, userId: string): Promise<Simulation> {
+	async create(input: { name: string; userId: string }): Promise<Simulation> {
 		const [s] = await this.client
 			.insert(simulations)
-			.values({ userId, ...input })
+			.values({ ...input })
 			.returning()
 		return s
 	}
 
 	async delete(id: string): Promise<void> {
-		const simulation = await this.findById(id)
-		if (!simulation) throw new Error("Simulation not found")
 		await this.client.delete(simulations).where(eq(simulations.id, id))
 	}
 
@@ -61,10 +63,7 @@ export class SimulationRepository {
 		return simulations
 	}
 
-	async update(
-		id: string,
-		updates: Partial<Omit<Simulation, "id" | "userId" | "createdAt">>,
-	): Promise<void> {
+	async update(id: string, updates: Partial<SimulationInsert>): Promise<void> {
 		await this.client
 			.update(simulations)
 			.set(updates)

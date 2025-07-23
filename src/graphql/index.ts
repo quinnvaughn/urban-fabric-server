@@ -12,6 +12,8 @@ import "../modules/layer-template/layer-template.type"
 import "../modules/layer-template/layer-template.resolver"
 import "../modules/category/category.type"
 import "../modules/category/category.resolver"
+import "../modules/simulation-state/simulation-state.type"
+import "../modules/simulation-state/simulation-state.resolver"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

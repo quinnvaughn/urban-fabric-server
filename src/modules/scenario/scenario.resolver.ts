@@ -10,7 +10,7 @@ builder.mutationFields((t) => ({
 	createScenario: t.fieldWithInput({
 		type: "Scenario",
 		errors: {
-			types: [UnauthorizedError],
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
 		},
 		input: {
 			name: t.input.string({ required: true }),
@@ -22,7 +22,10 @@ builder.mutationFields((t) => ({
 					"You must be logged in to create a scenario.",
 				)
 			}
-			return await services.scenario.createScenario(user.id, input)
+			return await services.scenario.createScenario({
+				userId: user.id,
+				...input,
+			})
 		},
 	}),
 	renameScenario: t.fieldWithInput({
@@ -45,7 +48,10 @@ builder.mutationFields((t) => ({
 					"You must be logged in to rename a scenario.",
 				)
 			}
-			return await services.scenario.renameScenario(user.id, input)
+			return await services.scenario.renameScenario({
+				userId: user.id,
+				...input,
+			})
 		},
 	}),
 }))

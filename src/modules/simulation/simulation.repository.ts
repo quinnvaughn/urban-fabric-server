@@ -5,10 +5,7 @@ import { type Simulation, simulations } from "./simulation.model"
 export class SimulationRepository {
 	constructor(readonly client: DbClient) {}
 
-	async create(
-		input: { name: string; description?: string },
-		userId: string,
-	): Promise<Simulation> {
+	async create(input: { name: string }, userId: string): Promise<Simulation> {
 		const [s] = await this.client
 			.insert(simulations)
 			.values({ userId, ...input })

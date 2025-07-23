@@ -10,7 +10,7 @@ builder.mutationFields((t) => ({
 	createSimulation: t.fieldWithInput({
 		type: "Simulation",
 		errors: {
-			types: [UnauthorizedError],
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
 		},
 		input: {
 			name: t.input.string({ required: true }),
@@ -26,7 +26,6 @@ builder.mutationFields((t) => ({
 				user.id,
 				{
 					name: input.name.trim(),
-					description: input.description?.trim() || undefined,
 				},
 			)
 
@@ -65,7 +64,6 @@ builder.mutationFields((t) => ({
 		input: {
 			id: t.input.id({ required: true }),
 			name: t.input.string({ required: false }),
-			description: t.input.string({ required: false }),
 		},
 		resolve: async (_parent, { input }, { services, user }) => {
 			if (!user) {
@@ -75,7 +73,6 @@ builder.mutationFields((t) => ({
 			}
 			await services.simulation.updateSimulation(input.id, user.id, {
 				name: input.name?.trim(),
-				description: input.description?.trim(),
 			})
 			return await services.simulation.getSimulation(input.id, user.id)
 		},

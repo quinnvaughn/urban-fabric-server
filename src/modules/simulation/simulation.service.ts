@@ -1,6 +1,7 @@
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
-import { ScenarioRepository } from "../scenario/scenario.repository"
+import { ScenarioService } from "../scenario/scenario.service"
+import { SimulationStateService } from "../simulation-state/simulation-state.service"
 import type { Simulation } from "./simulation.model"
 import { SimulationRepository } from "./simulation.repository"
 
@@ -11,19 +12,22 @@ export class SimulationService {
 		this.repo = new SimulationRepository(client)
 	}
 
-	async createSimulation(
-		userId: string,
-		input: { name: string; description?: string },
-	) {
+	async createSimulation(userId: string, input: { name: string }) {
 		return this.repo.client.transaction(async (tx) => {
 			const simulationRepo = new SimulationRepository(tx)
-			const scenarioRepo = new ScenarioRepository(tx)
+			const scenarioService = new ScenarioService(tx)
+			const simulationStateService = new SimulationStateService(tx)
 
 			const simulation = await simulationRepo.create(input, userId)
 			// add default scenario
-			await scenarioRepo.create({
+			const scenario = await scenarioService.createScenario(userId, {
 				simulationId: simulation.id,
 				name: "Untitled Scenario",
+			})
+			// create initial state
+			await simulationStateService.createState(userId, {
+				simulationId: simulation.id,
+				scenarioId: scenario.id,
 			})
 			return simulation
 		})

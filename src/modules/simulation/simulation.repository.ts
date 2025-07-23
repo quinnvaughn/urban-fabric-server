@@ -9,14 +9,11 @@ export class SimulationRepository {
 		input: { name: string; description?: string },
 		userId: string,
 	): Promise<Simulation> {
-		const [simulation] = await this.client.transaction(async (tx) => {
-			const [s] = await tx
-				.insert(simulations)
-				.values({ userId, ...input })
-				.returning()
-			return [s]
-		})
-		return simulation
+		const [s] = await this.client
+			.insert(simulations)
+			.values({ userId, ...input })
+			.returning()
+		return s
 	}
 
 	async delete(id: string): Promise<void> {

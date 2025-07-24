@@ -6,6 +6,8 @@ import { scenarioLoaders } from "../modules/scenario/scenario.loader"
 import { ScenarioRepository } from "../modules/scenario/scenario.repository"
 import { simulationLoaders } from "../modules/simulation/simulation.loader"
 import { SimulationRepository } from "../modules/simulation/simulation.repository"
+import { simulationStateLoaders } from "../modules/simulation-state/simulation-state.loader"
+import { SimulationStateRepository } from "../modules/simulation-state/simulation-state.repository"
 import { createUserLoader } from "../modules/user/user.loader"
 import { UserRepository } from "../modules/user/user.repository"
 import type { DbClient } from "../types/db"
@@ -16,6 +18,7 @@ export function createLoaders(db: DbClient) {
 	const scenarioRepo = new ScenarioRepository(db)
 	const layerInstanceRepo = new LayerInstanceRepository(db)
 	const layerTemplateRepo = new LayerTemplateRepository(db)
+	const simulationStateRepo = new SimulationStateRepository(db)
 
 	return {
 		user: createUserLoader(userRepo),
@@ -23,6 +26,7 @@ export function createLoaders(db: DbClient) {
 		scenario: scenarioLoaders(scenarioRepo),
 		layerInstance: layerInstanceLoaders(layerInstanceRepo),
 		layerTemplate: layerTemplateLoaders(layerTemplateRepo),
+		simulationState: simulationStateLoaders(simulationStateRepo),
 	}
 }
 

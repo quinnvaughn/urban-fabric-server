@@ -8,6 +8,7 @@ import type {
 	LayerInstance,
 	Scenario,
 	Simulation,
+	SimulationState,
 	User,
 } from "../db/schema"
 import type { LayerTemplate } from "../modules/layer-template/layer-template.model"
@@ -41,6 +42,7 @@ export const builder = new SchemaBuilder<{
 		Scenario: Scenario
 		LayerTemplate: LayerTemplate
 		Category: Category
+		SimulationState: SimulationState
 	}
 	Interfaces: {
 		LayerInstance: LayerInstance

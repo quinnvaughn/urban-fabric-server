@@ -1,3 +1,4 @@
+import { isUniqueViolation } from "../../db/utils"
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError, ValidationError } from "../error"
 import { SimulationRepository } from "../simulation/simulation.repository"
@@ -15,14 +16,10 @@ export class ScenarioService {
 	}
 
 	async createScenario(input: {
-		name: string
 		simulationId: string
 		userId: string
 	}): Promise<Scenario> {
-		const { name, simulationId, userId } = input
-		if (!name.trim()) {
-			throw new ValidationError([{ field: "name", message: "Required" }])
-		}
+		const { simulationId, userId } = input
 
 		const simulation = await this.simulationRepo.findById(simulationId)
 		if (!simulation) {
@@ -35,9 +32,52 @@ export class ScenarioService {
 		return await this.repo.client.transaction(async (tx) => {
 			const simulationStateService = new SimulationStateService(tx)
 			const repo = new ScenarioRepository(tx)
-			const scenario = await repo.create({
-				simulationId,
-				name: name.trim(),
+			const scenarios = await repo.findManyBySimulationId(simulationId)
+
+			const usedNumbers = scenarios
+				.map((s) => {
+					const match = s.name.match(/^Scenario (\d+)$/)
+					return match ? parseInt(match[1], 10) : null
+				})
+				.filter((n): n is number => n !== null)
+				.sort((a, b) => a - b)
+
+			// Find the lowest missing number starting at 1
+			let newNumber = 1
+			for (let i = 0; i < usedNumbers.length; i++) {
+				if (usedNumbers[i] !== i + 1) {
+					newNumber = i + 1
+					break
+				}
+				newNumber = usedNumbers.length + 1
+			}
+
+			let scenario: Scenario | null = null
+			let attempts = 0
+
+			while (true) {
+				attempts++
+				try {
+					scenario = await repo.create({
+						simulationId,
+						name: `Scenario ${newNumber}`,
+					})
+					break
+				} catch (err) {
+					if (isUniqueViolation(err) && attempts < 5) {
+						newNumber++
+						continue
+					}
+					throw new ValidationError([
+						{ field: "name", message: "Scenario name must be unique" },
+					])
+				}
+			}
+
+			// Update nextScenarioNumber to max + 1
+			const maxNumber = Math.max(newNumber, ...usedNumbers, 0)
+			await this.simulationRepo.update(simulationId, {
+				nextScenarioNumber: maxNumber + 1,
 			})
 			await simulationStateService.createState(userId, {
 				simulationId,

@@ -10,10 +10,14 @@ builder.mutationFields((t) => ({
 	createScenario: t.fieldWithInput({
 		type: "Scenario",
 		errors: {
-			types: [UnauthorizedError, NotFoundError, ForbiddenError],
+			types: [
+				UnauthorizedError,
+				NotFoundError,
+				ForbiddenError,
+				ValidationError,
+			],
 		},
 		input: {
-			name: t.input.string({ required: true }),
 			simulationId: t.input.id({ required: true }),
 		},
 		resolve: async (_parent, { input }, { services, user }) => {

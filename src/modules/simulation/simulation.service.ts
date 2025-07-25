@@ -24,7 +24,7 @@ export class SimulationService {
 			await scenarioService.createScenario({
 				userId: input.userId,
 				simulationId: simulation.id,
-				name: "Untitled Scenario",
+				name: "Scenario 1",
 			})
 			return simulation
 		})

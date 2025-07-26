@@ -19,10 +19,11 @@ export class SimulationStateService {
 		this.scenarioRepo = new ScenarioRepository(client)
 	}
 
-	async getStateByUserAndSimulation(
-		userId: string,
-		simulationId: string,
-	): Promise<SimulationState | null> {
+	async getStateByUserAndSimulation(input: {
+		userId: string
+		simulationId: string
+	}): Promise<SimulationState | null> {
+		const { userId, simulationId } = input
 		// check if userId and simulationId are valid
 		const user = await this.userRepo.findUserById(userId)
 		if (!user) throw new NotFoundError(`User with id ${userId} not found`)

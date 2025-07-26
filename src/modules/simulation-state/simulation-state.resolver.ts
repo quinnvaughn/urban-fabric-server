@@ -2,11 +2,10 @@ import { builder } from "../../graphql/builder"
 import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
 
 builder.mutationFields((t) => ({
-	updateLastViewedSimulation: t.fieldWithInput({
-		type: "Boolean",
+	updateLastViewedScenario: t.fieldWithInput({
+		type: "SimulationState",
 		errors: {
 			types: [UnauthorizedError, NotFoundError, ForbiddenError],
-			directResult: false,
 		},
 		input: {
 			simulationId: t.input.id({ required: true }),
@@ -19,7 +18,16 @@ builder.mutationFields((t) => ({
 				)
 			}
 			await services.simulationState.viewNewScenario(user.id, input)
-			return true
+			const state = await services.simulationState.getStateByUserAndSimulation({
+				simulationId: input.simulationId,
+				userId: user.id,
+			})
+			if (!state) {
+				throw new NotFoundError(
+					`Simulation state not found for user ${user.id} and simulation ${input.simulationId}`,
+				)
+			}
+			return { ...state, __typename: "SimulationState" }
 		},
 	}),
 }))

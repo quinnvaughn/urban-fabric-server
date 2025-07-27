@@ -14,6 +14,7 @@ builder.objectType("SimulationState", {
 				return user
 			},
 		}),
+		lastOpenedAt: t.expose("lastOpenedAt", { type: "DateTime" }),
 		simulation: t.field({
 			type: "Simulation",
 			resolve: async (state, _args, { loaders }) => {

@@ -102,4 +102,24 @@ export class SimulationStateService {
 
 		await this.repo.viewNewScenario(user.id, simulation.id, scenario.id)
 	}
+
+	async updateLastOpenedAt(input: {
+		userId: string
+		simulationId: string
+	}): Promise<void> {
+		const { simulationId, userId } = input
+		const user = await this.userRepo.findUserById(userId)
+		if (!user) throw new NotFoundError(`User with id ${userId} not found`)
+
+		const simulation = await this.simulationRepo.findById(simulationId)
+		if (!simulation)
+			throw new NotFoundError(`Simulation with id ${simulationId} not found`)
+
+		if (simulation.userId !== userId) {
+			throw new ForbiddenError(
+				`User ${userId} does not have permission to view state for simulation ${simulationId}`,
+			)
+		}
+		await this.repo.updateLastOpenedAt(userId, simulationId)
+	}
 }

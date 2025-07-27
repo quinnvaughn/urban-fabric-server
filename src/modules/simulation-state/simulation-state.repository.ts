@@ -53,4 +53,21 @@ export class SimulationStateRepository {
 				),
 			)
 	}
+
+	async updateLastOpenedAt(
+		userId: string,
+		simulationId: string,
+	): Promise<void> {
+		await this.client
+			.update(simulationState)
+			.set({
+				lastOpenedAt: new Date(),
+			})
+			.where(
+				and(
+					eq(simulationState.userId, userId),
+					eq(simulationState.simulationId, simulationId),
+				),
+			)
+	}
 }

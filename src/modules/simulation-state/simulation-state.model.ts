@@ -1,5 +1,5 @@
 import { cuid2 } from "drizzle-cuid2/postgres"
-import { pgTable } from "drizzle-orm/pg-core"
+import { pgTable, timestamp } from "drizzle-orm/pg-core"
 import { baseFields } from "../../db/fields"
 import { simulations } from "../simulation/simulation.model"
 import { users } from "../user/user.model"
@@ -16,6 +16,9 @@ export const simulationState = pgTable("simulation_state", {
 		.references(() => users.id)
 		.notNull(),
 	lastViewedScenarioId: cuid2("last_viewed_scenario_id").notNull(),
+	lastOpenedAt: timestamp("last_opened_at", { withTimezone: true })
+		.notNull()
+		.defaultNow(),
 })
 
 export type SimulationState = typeof simulationState.$inferSelect

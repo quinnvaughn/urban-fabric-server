@@ -30,4 +30,34 @@ builder.mutationFields((t) => ({
 			return { ...state, __typename: "SimulationState" }
 		},
 	}),
+	updateLastOpenedAt: t.fieldWithInput({
+		type: "SimulationState",
+		errors: {
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
+		},
+		input: {
+			simulationId: t.input.id({ required: true }),
+		},
+		resolve: async (_p, { input }, { services, user }) => {
+			if (!user) {
+				throw new UnauthorizedError(
+					"You must be logged in to update the last opened simulation.",
+				)
+			}
+			await services.simulationState.updateLastOpenedAt({
+				userId: user.id,
+				simulationId: input.simulationId,
+			})
+			const state = await services.simulationState.getStateByUserAndSimulation({
+				simulationId: input.simulationId,
+				userId: user.id,
+			})
+			if (!state) {
+				throw new NotFoundError(
+					`Simulation state not found for user ${user.id} and simulation ${input.simulationId}`,
+				)
+			}
+			return { ...state, __typename: "SimulationState" }
+		},
+	}),
 }))

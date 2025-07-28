@@ -58,4 +58,26 @@ builder.mutationFields((t) => ({
 			})
 		},
 	}),
+	deleteScenario: t.fieldWithInput({
+		type: "Boolean",
+		errors: {
+			directResult: false,
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
+		},
+		input: {
+			id: t.input.id({ required: true }),
+		},
+		resolve: async (_parent, { input }, { services, user }) => {
+			if (!user) {
+				throw new UnauthorizedError(
+					"You must be logged in to delete a scenario.",
+				)
+			}
+			await services.scenario.deleteScenario({
+				userId: user.id,
+				...input,
+			})
+			return true
+		},
+	}),
 }))

@@ -62,6 +62,7 @@ builder.mutationFields((t) => ({
 		input: {
 			id: t.input.id({ required: true }),
 			name: t.input.string({ required: false }),
+			description: t.input.string({ required: false }),
 		},
 		resolve: async (_parent, { input }, { services, user }) => {
 			if (!user) {
@@ -69,8 +70,13 @@ builder.mutationFields((t) => ({
 					"You must be logged in to update a simulation.",
 				)
 			}
-			await services.simulation.updateSimulation(input.id, user.id, {
-				name: input.name?.trim(),
+			await services.simulation.updateSimulation({
+				id: input.id,
+				userId: user.id,
+				updates: {
+					name: input.name?.trim(),
+					description: input.description?.trim(),
+				},
 			})
 			return await services.simulation.getSimulation({
 				...input,

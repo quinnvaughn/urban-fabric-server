@@ -24,7 +24,6 @@ export class SimulationService {
 			await scenarioService.createScenario({
 				userId: input.userId,
 				simulationId: simulation.id,
-				name: "Scenario 1",
 			})
 			return simulation
 		})
@@ -47,11 +46,12 @@ export class SimulationService {
 		return simulation
 	}
 
-	async updateSimulation(
-		id: string,
-		userId: string,
-		updates: Partial<SimulationInsert>,
-	) {
+	async updateSimulation(input: {
+		id: string
+		userId: string
+		updates: Partial<SimulationInsert>
+	}) {
+		const { id, userId, updates } = input
 		await this.getSimulation({ id, userId }) // Ensure simulation exists and belongs to user
 		if (updates.name !== undefined && !updates.name.trim()) {
 			throw new ValidationError([{ field: "name", message: "Required" }])

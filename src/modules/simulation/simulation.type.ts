@@ -4,6 +4,9 @@ builder.objectType("Simulation", {
 	fields: (t) => ({
 		id: t.exposeID("id"),
 		name: t.exposeString("name"),
+		description: t.exposeString("description", {
+			nullable: true,
+		}),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 		author: t.field({

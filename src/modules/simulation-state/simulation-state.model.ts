@@ -10,7 +10,7 @@ import { users } from "../user/user.model"
 export const simulationState = pgTable("simulation_state", {
 	...baseFields,
 	simulationId: cuid2("simulation_id")
-		.references(() => simulations.id)
+		.references(() => simulations.id, { onDelete: "cascade" })
 		.notNull(),
 	userId: cuid2("user_id")
 		.references(() => users.id)

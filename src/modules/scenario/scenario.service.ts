@@ -22,36 +22,16 @@ export class ScenarioService {
 		const { simulationId, userId } = input
 
 		const simulation = await this.simulationRepo.findById(simulationId)
-		if (!simulation) {
-			throw new NotFoundError("Simulation not found")
-		}
-		if (simulation.userId !== userId) {
+		if (!simulation) throw new NotFoundError("Simulation not found")
+		if (simulation.userId !== userId)
 			throw new ForbiddenError("You do not own this simulation")
-		}
 
 		return await this.repo.client.transaction(async (tx) => {
 			const simulationStateService = new SimulationStateService(tx)
 			const repo = new ScenarioRepository(tx)
-			const scenarios = await repo.findManyBySimulationId(simulationId)
 
-			const usedNumbers = scenarios
-				.map((s) => {
-					const match = s.name.match(/^Scenario (\d+)$/)
-					return match ? parseInt(match[1], 10) : null
-				})
-				.filter((n): n is number => n !== null)
-				.sort((a, b) => a - b)
-
-			// Find the lowest missing number starting at 1
-			let newNumber = 1
-			for (let i = 0; i < usedNumbers.length; i++) {
-				if (usedNumbers[i] !== i + 1) {
-					newNumber = i + 1
-					break
-				}
-				newNumber = usedNumbers.length + 1
-			}
-
+			// start from nextScenarioNumber or 1 if not set
+			let newNumber = simulation.nextScenarioNumber ?? 1
 			let scenario: Scenario | null = null
 			let attempts = 0
 
@@ -64,7 +44,7 @@ export class ScenarioService {
 					})
 					break
 				} catch (err) {
-					if (isUniqueViolation(err) && attempts < 5) {
+					if (isUniqueViolation(err) && attempts < 20) {
 						newNumber++
 						continue
 					}
@@ -74,15 +54,16 @@ export class ScenarioService {
 				}
 			}
 
-			// Update nextScenarioNumber to max + 1
-			const maxNumber = Math.max(newNumber, ...usedNumbers, 0)
+			// bump nextScenarioNumber for future
 			await this.simulationRepo.update(simulationId, {
-				nextScenarioNumber: maxNumber + 1,
+				nextScenarioNumber: newNumber + 1,
 			})
+
 			await simulationStateService.createState(userId, {
 				simulationId,
 				scenarioId: scenario.id,
 			})
+
 			return scenario
 		})
 	}

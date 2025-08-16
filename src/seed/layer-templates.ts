@@ -60,18 +60,21 @@ const DEFAULT_SCENARIO_LAYER_TEMPLATES: LayerTemplateInsert[] = [
 			},
 		},
 		interactionConfig: {
-			toolType: "draw",
-			defaultCursor: "crosshair",
+			toolType: "place",
+			defaultCursor: "pointer",
 			validCursor: "pointer",
 			invalidCursor: "not-allowed",
-			validTargetLayers: ["road-centerline"],
+			validTargetLayers: ["road-centerline-hitbox"],
 			hoverStyle: {
-				"line-color": "#0af",
+				"line-color": "#00B251",
 				"line-width": 4,
 			},
 			activeStyle: {
-				"line-color": "#07a",
+				"line-color": "#00833D",
 				"line-width": 6,
+			},
+			featureFilter: {
+				excludeClasses: ["path", "pedestrian"],
 			},
 		},
 	},

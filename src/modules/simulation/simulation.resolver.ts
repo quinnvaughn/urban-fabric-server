@@ -84,6 +84,26 @@ builder.mutationFields((t) => ({
 			})
 		},
 	}),
+	setSimulationViewCenter: t.fieldWithInput({
+		type: "Boolean",
+		errors: {
+			types: [UnauthorizedError, NotFoundError, ForbiddenError],
+		},
+		input: {
+			simulationId: t.input.id({ required: true }),
+			lat: t.input.float({ required: true }),
+			lng: t.input.float({ required: true }),
+		},
+		resolve: async (_parent, { input }, { services, user }) => {
+			if (!user) {
+				throw new UnauthorizedError(
+					"You must be logged in to set the view center.",
+				)
+			}
+			await services.simulation.setViewCenter({ ...input, userId: user.id })
+			return true
+		},
+	}),
 }))
 
 builder.queryFields((t) => ({

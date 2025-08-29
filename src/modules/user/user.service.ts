@@ -50,4 +50,9 @@ export class UserService {
 		if (!user) throw new NotFoundError("User not found")
 		return user
 	}
+
+	async setDefaultLatLng(input: { userId: string; lat: number; lng: number }) {
+		await this.getUserById(input.userId) // ensure user exists
+		return this.repo.setDefaultLatLng(input)
+	}
 }

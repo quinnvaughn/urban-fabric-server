@@ -70,4 +70,19 @@ export class SimulationRepository {
 			.where(eq(simulations.id, id))
 			.execute()
 	}
+
+	async setViewCenter(input: {
+		simulationId: string
+		lat: number
+		lng: number
+	}): Promise<void> {
+		await this.client
+			.update(simulations)
+			.set({
+				viewCenterLat: input.lat,
+				viewCenterLng: input.lng,
+			})
+			.where(eq(simulations.id, input.simulationId))
+			.execute()
+	}
 }

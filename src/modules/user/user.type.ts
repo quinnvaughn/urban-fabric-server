@@ -13,5 +13,7 @@ builder.objectType("User", {
 				return loaders.simulation.byUserId.load(user.id)
 			},
 		}),
+		defaultLat: t.exposeFloat("defaultLat", { nullable: true }),
+		defaultLng: t.exposeFloat("defaultLng", { nullable: true }),
 	}),
 })

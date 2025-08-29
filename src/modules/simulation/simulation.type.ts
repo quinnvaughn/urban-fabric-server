@@ -7,6 +7,8 @@ builder.objectType("Simulation", {
 		description: t.exposeString("description", {
 			nullable: true,
 		}),
+		viewCenterLat: t.exposeFloat("viewCenterLat", { nullable: true }),
+		viewCenterLng: t.exposeFloat("viewCenterLng", { nullable: true }),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 		author: t.field({

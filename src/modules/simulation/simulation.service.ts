@@ -63,4 +63,14 @@ export class SimulationService {
 		await this.getSimulation(input) // Ensure simulation exists and belongs to user
 		await this.repo.delete(input.id)
 	}
+
+	async setViewCenter(input: {
+		simulationId: string
+		lat: number
+		lng: number
+		userId: string
+	}): Promise<void> {
+		await this.getSimulation({ id: input.simulationId, userId: input.userId })
+		await this.repo.setViewCenter(input)
+	}
 }

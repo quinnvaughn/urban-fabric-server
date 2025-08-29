@@ -69,8 +69,8 @@ export class SimulationService {
 		lat: number
 		lng: number
 		userId: string
-	}): Promise<void> {
+	}): Promise<Simulation> {
 		await this.getSimulation({ id: input.simulationId, userId: input.userId })
-		await this.repo.setViewCenter(input)
+		return await this.repo.setViewCenter(input)
 	}
 }

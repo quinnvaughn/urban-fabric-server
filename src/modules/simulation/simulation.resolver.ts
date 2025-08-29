@@ -85,7 +85,7 @@ builder.mutationFields((t) => ({
 		},
 	}),
 	setSimulationViewCenter: t.fieldWithInput({
-		type: "Boolean",
+		type: "Simulation",
 		errors: {
 			types: [UnauthorizedError, NotFoundError, ForbiddenError],
 		},
@@ -100,8 +100,10 @@ builder.mutationFields((t) => ({
 					"You must be logged in to set the view center.",
 				)
 			}
-			await services.simulation.setViewCenter({ ...input, userId: user.id })
-			return true
+			return await services.simulation.setViewCenter({
+				...input,
+				userId: user.id,
+			})
 		},
 	}),
 }))

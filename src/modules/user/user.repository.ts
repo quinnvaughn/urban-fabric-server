@@ -41,12 +41,18 @@ export class UserRepository {
 			.then(([user]) => user)
 	}
 
-	async setDefaultLatLng(input: { userId: string; lat: number; lng: number }) {
+	async setDefaultCenter(input: {
+		userId: string
+		lat: number
+		lng: number
+		zoom: number
+	}) {
 		return this.client
 			.update(users)
 			.set({
 				defaultLat: input.lat,
 				defaultLng: input.lng,
+				defaultZoom: input.zoom,
 			})
 			.where(eq(users.id, input.userId))
 			.returning()

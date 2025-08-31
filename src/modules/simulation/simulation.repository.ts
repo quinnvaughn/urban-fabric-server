@@ -75,12 +75,14 @@ export class SimulationRepository {
 		simulationId: string
 		lat: number
 		lng: number
+		zoom: number
 	}): Promise<Simulation> {
 		return await this.client
 			.update(simulations)
 			.set({
 				viewCenterLat: input.lat,
 				viewCenterLng: input.lng,
+				viewZoom: input.zoom,
 			})
 			.where(eq(simulations.id, input.simulationId))
 			.returning()

@@ -14,6 +14,9 @@ export class SimulationService {
 	async createSimulation(input: {
 		name: string
 		userId: string
+		viewCenterLat: number
+		viewCenterLng: number
+		viewZoom: number
 	}): Promise<Simulation> {
 		return this.repo.client.transaction(async (tx) => {
 			const simulationRepo = new SimulationRepository(tx)
@@ -68,6 +71,7 @@ export class SimulationService {
 		simulationId: string
 		lat: number
 		lng: number
+		zoom: number
 		userId: string
 	}): Promise<Simulation> {
 		await this.getSimulation({ id: input.simulationId, userId: input.userId })

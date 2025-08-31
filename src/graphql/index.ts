@@ -14,6 +14,7 @@ import "../modules/category/category.type"
 import "../modules/category/category.resolver"
 import "../modules/simulation-state/simulation-state.type"
 import "../modules/simulation-state/simulation-state.resolver"
+import "../modules/map-view/map-view.type"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

@@ -12,6 +12,7 @@ import type {
 	User,
 } from "../db/schema"
 import type { LayerTemplate } from "../modules/layer-template/layer-template.model"
+import type { MapView } from "../modules/map-view/map-view.type"
 import type { GraphQLContext } from "./context"
 
 function capitalize(str: string): string {
@@ -43,6 +44,7 @@ export const builder = new SchemaBuilder<{
 		LayerTemplate: LayerTemplate
 		Category: Category
 		SimulationState: SimulationState
+		MapView: MapView
 	}
 	Interfaces: {
 		LayerInstance: LayerInstance

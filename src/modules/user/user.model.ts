@@ -1,11 +1,5 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm"
-import {
-	doublePrecision,
-	json,
-	pgTable,
-	timestamp,
-	varchar,
-} from "drizzle-orm/pg-core"
+import { json, pgTable, timestamp, varchar } from "drizzle-orm/pg-core"
 import { baseFields } from "../../db/fields"
 
 export const users = pgTable("users", {
@@ -14,8 +8,6 @@ export const users = pgTable("users", {
 	hashedPassword: varchar("hashed_password", { length: 255 }).notNull(),
 	name: varchar("name", { length: 100 }),
 	role: varchar("role", { length: 50 }).default("user").notNull(),
-	defaultLat: doublePrecision("default_lat"),
-	defaultLng: doublePrecision("default_lng"),
 })
 
 export const sessions = pgTable("sessions", {

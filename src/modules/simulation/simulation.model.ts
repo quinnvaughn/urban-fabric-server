@@ -11,8 +11,9 @@ export const simulations = pgTable("simulations", {
 	name: varchar("name", { length: 255 }).notNull(),
 	description: varchar("description", { length: 1000 }),
 	nextScenarioNumber: integer("next_scenario_number").notNull().default(1),
-	viewCenterLat: doublePrecision("view_center_lat"),
-	viewCenterLng: doublePrecision("view_center_lng"),
+	viewCenterLat: doublePrecision("view_center_lat").notNull().default(0),
+	viewCenterLng: doublePrecision("view_center_lng").notNull().default(0),
+	viewZoom: doublePrecision("view_zoom").notNull().default(14.0),
 })
 
 export type Simulation = typeof simulations.$inferSelect

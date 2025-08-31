@@ -75,15 +75,16 @@ builder.mutationFields((t) => ({
 			})
 		},
 	}),
-	setDefaultLatLng: t.fieldWithInput({
+	setDefaultCenter: t.fieldWithInput({
 		type: "User",
 		input: {
 			lat: t.input.float({ required: true }),
 			lng: t.input.float({ required: true }),
+			zoom: t.input.int({ required: true }),
 		},
 		resolve: async (_parent, { input }, { user, services }) => {
 			if (!user) throw new UnauthorizedError("You must be logged in.")
-			return services.user.setDefaultLatLng({ userId: user.id, ...input })
+			return services.user.setDefaultCenter({ userId: user.id, ...input })
 		},
 	}),
 }))

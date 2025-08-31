@@ -22,9 +22,14 @@ builder.mutationFields((t) => ({
 					"You must be logged in to create a simulation.",
 				)
 			}
+			// TODO: Get lat/lng from request
+			// for now, use default values
 			const newSimulation = await services.simulation.createSimulation({
 				userId: user.id,
 				name: input.name.trim(),
+				viewCenterLat: 34.0195,
+				viewCenterLng: -118.4912,
+				viewZoom: 14.0,
 			})
 
 			return { ...newSimulation, __typename: "Simulation" }
@@ -93,13 +98,15 @@ builder.mutationFields((t) => ({
 			simulationId: t.input.id({ required: true }),
 			lat: t.input.float({ required: true }),
 			lng: t.input.float({ required: true }),
+			zoom: t.input.int({ required: true }),
 		},
-		resolve: async (_parent, { input }, { services, user }) => {
+		resolve: async (_parent, { input }, { services, user, req }) => {
 			if (!user) {
 				throw new UnauthorizedError(
 					"You must be logged in to set the view center.",
 				)
 			}
+			console.log(req.ip)
 			return await services.simulation.setViewCenter({
 				...input,
 				userId: user.id,

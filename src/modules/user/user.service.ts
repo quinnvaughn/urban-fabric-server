@@ -51,8 +51,13 @@ export class UserService {
 		return user
 	}
 
-	async setDefaultLatLng(input: { userId: string; lat: number; lng: number }) {
+	async setDefaultCenter(input: {
+		userId: string
+		lat: number
+		lng: number
+		zoom: number
+	}) {
 		await this.getUserById(input.userId) // ensure user exists
-		return this.repo.setDefaultLatLng(input)
+		return this.repo.setDefaultCenter(input)
 	}
 }

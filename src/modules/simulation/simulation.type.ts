@@ -7,8 +7,16 @@ builder.objectType("Simulation", {
 		description: t.exposeString("description", {
 			nullable: true,
 		}),
-		viewCenterLat: t.exposeFloat("viewCenterLat", { nullable: true }),
-		viewCenterLng: t.exposeFloat("viewCenterLng", { nullable: true }),
+		center: t.field({
+			type: "MapView",
+			resolve: (simulation) => {
+				return {
+					lat: simulation.viewCenterLat,
+					lng: simulation.viewCenterLng,
+					zoom: simulation.viewZoom,
+				}
+			},
+		}),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 		author: t.field({

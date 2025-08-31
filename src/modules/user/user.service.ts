@@ -50,14 +50,4 @@ export class UserService {
 		if (!user) throw new NotFoundError("User not found")
 		return user
 	}
-
-	async setDefaultCenter(input: {
-		userId: string
-		lat: number
-		lng: number
-		zoom: number
-	}) {
-		await this.getUserById(input.userId) // ensure user exists
-		return this.repo.setDefaultCenter(input)
-	}
 }

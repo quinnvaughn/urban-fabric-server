@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm"
 import type { DbClient } from "../../types/db"
 import { type UserInsert, users } from "./user.model"
 
@@ -37,24 +36,6 @@ export class UserRepository {
 			.values({
 				...input,
 			})
-			.returning()
-			.then(([user]) => user)
-	}
-
-	async setDefaultCenter(input: {
-		userId: string
-		lat: number
-		lng: number
-		zoom: number
-	}) {
-		return this.client
-			.update(users)
-			.set({
-				defaultLat: input.lat,
-				defaultLng: input.lng,
-				defaultZoom: input.zoom,
-			})
-			.where(eq(users.id, input.userId))
 			.returning()
 			.then(([user]) => user)
 	}

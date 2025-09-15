@@ -10,6 +10,6 @@ builder.simpleObject("MapView", {
 	fields: (t) => ({
 		lat: t.float(),
 		lng: t.float(),
-		zoom: t.int(),
+		zoom: t.float(),
 	}),
 })

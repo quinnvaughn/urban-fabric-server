@@ -98,15 +98,14 @@ builder.mutationFields((t) => ({
 			simulationId: t.input.id({ required: true }),
 			lat: t.input.float({ required: true }),
 			lng: t.input.float({ required: true }),
-			zoom: t.input.int({ required: true }),
+			zoom: t.input.float({ required: true }),
 		},
-		resolve: async (_parent, { input }, { services, user, req }) => {
+		resolve: async (_parent, { input }, { services, user }) => {
 			if (!user) {
 				throw new UnauthorizedError(
 					"You must be logged in to set the view center.",
 				)
 			}
-			console.log(req.ip)
 			return await services.simulation.setViewCenter({
 				...input,
 				userId: user.id,

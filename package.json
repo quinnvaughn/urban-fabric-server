@@ -10,7 +10,8 @@
     "test": "bun --env=test vitest run --coverage",
     "test:watch": "bun --env=test vitest --watch",
     "test:ui": "bun --env=test vitest --ui",
-    "seed": "bun src/seed/index.ts"
+    "seed": "bun src/seed/index.ts",
+    "whitelist": "bun scripts/whitelist-users.ts"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +43,7 @@
     "bcrypt": "^6.0.0",
     "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
+    "csv-parse": "^6.1.0",
     "dataloader": "^2.2.3",
     "dotenv": "^17.0.1",
     "drizzle-cuid2": "^2.1.0",

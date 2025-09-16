@@ -25,6 +25,19 @@ export class UserService {
 
 			const normalizedEmail = input.email.toLowerCase().trim()
 
+			// check if email is on whitelist
+			const isValidEmail = await this.repo.client.query.whitelists.findFirst({
+				where: {
+					email: normalizedEmail,
+				},
+			})
+
+			if (!isValidEmail) {
+				throw new ValidationError([
+					{ field: "email", message: "Email is not on the whitelist" },
+				])
+			}
+
 			const hashed = await bcrypt.hash(input.password, 12)
 			const user = await repoTx.createUser({
 				email: normalizedEmail,

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
 import { NotFoundError, UnauthorizedError, ValidationError } from "../error"
+import { WhitelistRepository } from "../whitelist/whitelist.repository"
 import type { UserInsert } from "./user.model"
 import { UserRepository } from "./user.repository"
 
@@ -16,6 +17,7 @@ export class UserService {
 	) {
 		return this.repo.client.transaction(async (tx) => {
 			const repoTx = new UserRepository(tx)
+			const whitelistRepo = new WhitelistRepository(tx)
 			const existing = await repoTx.findUserByEmail(input.email)
 			if (existing) {
 				throw new ValidationError([
@@ -26,11 +28,8 @@ export class UserService {
 			const normalizedEmail = input.email.toLowerCase().trim()
 
 			// check if email is on whitelist
-			const isValidEmail = await this.repo.client.query.whitelists.findFirst({
-				where: {
-					email: normalizedEmail,
-				},
-			})
+			const isValidEmail =
+				await whitelistRepo.isEmailWhitelisted(normalizedEmail)
 
 			if (!isValidEmail) {
 				throw new ValidationError([

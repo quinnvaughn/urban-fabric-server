@@ -16,7 +16,6 @@ builder.mutationFields((t) => ({
 		input: {
 			email: t.input.string({ required: true }),
 			password: t.input.string({ required: true }),
-			role: t.input.string({ required: false }),
 		},
 		resolve: async (_parent, { input }, { user, services, req }) => {
 			// check if user is already registered
@@ -25,7 +24,7 @@ builder.mutationFields((t) => ({
 			}
 			const newUser = await services.user.registerUser({
 				...input,
-				role: input.role || "user",
+				role: "user",
 			})
 			req.session.userId = newUser.id
 			return { ...newUser, __typename: "User" }

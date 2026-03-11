@@ -54,11 +54,13 @@ export class FieldError {
 /**
  * 400 Bad Request Error
  */
-export class ValidationError extends ApplicationError {
+export class ValidationError extends Error {
 	public readonly errors: FieldError[]
 
 	constructor(errors: FieldError[]) {
-		super("Validation failed")
+		super()
+		this.name = this.constructor.name
+		Object.setPrototypeOf(this, new.target.prototype)
 		this.errors = errors
 	}
 }

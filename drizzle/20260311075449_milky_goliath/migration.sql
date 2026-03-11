@@ -1,0 +1,1 @@
+ALTER TABLE "fabrics" ADD COLUMN "title" text DEFAULT 'Untitled Fabric' NOT NULL;

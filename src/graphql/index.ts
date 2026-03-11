@@ -1,20 +1,8 @@
 import { builder } from "./builder"
-import "../modules/user/user.type"
-import "../modules/user/user.resolver"
 import "../modules/error/error.type"
-import "../modules/simulation/simulation.type"
-import "../modules/simulation/simulation.resolver"
-import "../modules/scenario/scenario.type"
-import "../modules/scenario/scenario.resolver"
-import "../modules/layer-instance/layer-instance.type"
-import "../modules/layer-instance/layer-instance.resolver"
-import "../modules/layer-template/layer-template.type"
-import "../modules/layer-template/layer-template.resolver"
-import "../modules/category/category.type"
-import "../modules/category/category.resolver"
-import "../modules/simulation-state/simulation-state.type"
-import "../modules/simulation-state/simulation-state.resolver"
-import "../modules/map-view/map-view.type"
+import "../modules/fabric/fabric.type"
+import "../modules/proposal/proposal.type"
+import "../modules/user/user.type"
 import {
 	DateTimeResolver,
 	GeoJSONResolver,

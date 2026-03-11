@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt"
 import type { DbClient } from "../../types/db"
 import { UnauthorizedError, ValidationError } from "../error"
-import { WhitelistRepository } from "../whitelist/whitelist.repository"
 import type { User } from "./user.model"
 import { UserRepository } from "./user.repository"
 import { UserService } from "./user.service"
@@ -30,10 +29,6 @@ describe("User Service", () => {
 			name: "A",
 			role: "user",
 		} as User)
-		vi.spyOn(
-			WhitelistRepository.prototype,
-			"isEmailWhitelisted",
-		).mockResolvedValue(true)
 		vi.spyOn(bcrypt, "hash").mockImplementation(() =>
 			Promise.resolve("hashedpw"),
 		)

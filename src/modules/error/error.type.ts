@@ -37,12 +37,10 @@ builder.objectType(ForbiddenError, {
 
 builder.objectType(ValidationError, {
 	name: "ValidationError",
-	interfaces: [ErrorInterface],
 	fields: (t) => ({
 		errors: t.field({
 			type: [FieldError],
-			nullable: true,
-			resolve: (error) => error.errors || [],
+			resolve: (error) => error.errors,
 		}),
 	}),
 })

@@ -25,7 +25,6 @@ export const fabrics = pgTable(
 			srid: 4326,
 		}).notNull(),
 		originZoom: doublePrecision("origin_zoom").notNull(),
-		originPitch: doublePrecision("origin_pitch").notNull(),
 		originBearing: doublePrecision("origin_bearing").notNull(),
 		viewportCenter: geometry("viewport_center", {
 			type: "point",
@@ -33,8 +32,10 @@ export const fabrics = pgTable(
 			srid: 4326,
 		}).notNull(),
 		viewportZoom: doublePrecision("viewport_zoom").notNull(),
-		viewportPitch: doublePrecision("viewport_pitch").notNull(),
 		viewportBearing: doublePrecision("viewport_bearing").notNull(),
+		locationCity: text("location_city").notNull(),
+		locationRegion: text("location_region").notNull(),
+		locationCountry: text("location_country").notNull(),
 		title: text("title").notNull().default("Untitled Fabric"),
 	},
 	(t) => [

@@ -1,9 +1,5 @@
 import { builder } from "../../graphql/builder"
-import {
-	ForbiddenError,
-	NotFoundError,
-	UnauthorizedError,
-} from "../error"
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
 
 const Coordinate = builder.simpleObject("Coordinate", {
 	fields: (t) => ({
@@ -22,7 +18,6 @@ const CoordinateInput = builder.inputType("CoordinateInput", {
 builder.objectType("Fabric", {
 	fields: (t) => ({
 		id: t.exposeID("id"),
-		creatorId: t.exposeID("creatorId"),
 		changes: t.field({
 			type: "JSON",
 			resolve: (fabric) => fabric.changes as Record<string, unknown>,
@@ -35,7 +30,6 @@ builder.objectType("Fabric", {
 			}),
 		}),
 		originZoom: t.exposeFloat("originZoom"),
-		originPitch: t.exposeFloat("originPitch"),
 		originBearing: t.exposeFloat("originBearing"),
 		viewportCenter: t.field({
 			type: Coordinate,
@@ -45,9 +39,11 @@ builder.objectType("Fabric", {
 			}),
 		}),
 		viewportZoom: t.exposeFloat("viewportZoom"),
-		viewportPitch: t.exposeFloat("viewportPitch"),
 		viewportBearing: t.exposeFloat("viewportBearing"),
 		title: t.exposeString("title"),
+		locationCity: t.exposeString("locationCity"),
+		locationRegion: t.exposeString("locationRegion"),
+		locationCountry: t.exposeString("locationCountry"),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 	}),
@@ -64,9 +60,14 @@ builder.queryFields((t) => ({
 	myFabrics: t.field({
 		type: ["Fabric"],
 		errors: { types: [UnauthorizedError] },
-		resolve: (_parent, _args, { user, services }) => {
+		args: {
+			limit: t.arg.int({ required: false }),
+		},
+		resolve: (_parent, { limit }, { user, services }) => {
 			if (!user) throw new UnauthorizedError()
-			return services.fabric.getFabricsByCreatorId(user.id)
+			return services.fabric.getFabricsByCreatorId(user.id, {
+				limit: limit ?? undefined,
+			})
 		},
 	}),
 }))
@@ -85,11 +86,9 @@ builder.mutationFields((t) => ({
 				creatorId: user.id,
 				originCenter: center,
 				originZoom: 12,
-				originPitch: 0,
 				originBearing: 0,
 				viewportCenter: center,
 				viewportZoom: 12,
-				viewportPitch: 0,
 				viewportBearing: 0,
 			})
 		},
@@ -101,7 +100,6 @@ builder.mutationFields((t) => ({
 			id: t.input.id(),
 			center: t.input.field({ type: CoordinateInput }),
 			zoom: t.input.float(),
-			pitch: t.input.float(),
 			bearing: t.input.float(),
 		},
 		resolve: (_parent, { input }, { user, services }) => {
@@ -109,7 +107,6 @@ builder.mutationFields((t) => ({
 			return services.fabric.syncViewport(input.id, user.id, {
 				center: [input.center.lng, input.center.lat],
 				zoom: input.zoom,
-				pitch: input.pitch,
 				bearing: input.bearing,
 			})
 		},

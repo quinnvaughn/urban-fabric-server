@@ -1,3 +1,4 @@
+import { reverseGeocode } from "../../lib/geocoding"
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError } from "../error"
 import type { Fabric, FabricInsert } from "./fabric.model"
@@ -16,14 +17,29 @@ export class FabricService {
 		return fabric
 	}
 
-	async getFabricsByCreatorId(creatorId: string) {
-		return this.repo.findManyByCreatorId(creatorId)
+	async getFabricsByCreatorId(creatorId: string, options?: { limit?: number }) {
+		return this.repo.findManyByCreatorId(creatorId, options)
 	}
 
 	async createFabric(
-		input: Omit<FabricInsert, "id" | "createdAt" | "updatedAt">,
+		input: Omit<
+			FabricInsert,
+			| "id"
+			| "createdAt"
+			| "updatedAt"
+			| "locationCity"
+			| "locationRegion"
+			| "locationCountry"
+		>,
 	): Promise<Fabric> {
-		const fabric = await this.repo.create(input)
+		const [lng, lat] = input.originCenter
+		const location = await reverseGeocode(lng, lat)
+		const fabric = await this.repo.create({
+			...input,
+			locationCity: location.city,
+			locationRegion: location.region,
+			locationCountry: location.country,
+		})
 		if (!fabric) throw new Error("Failed to create fabric")
 		return fabric
 	}
@@ -34,7 +50,6 @@ export class FabricService {
 		viewport: {
 			center: [number, number]
 			zoom: number
-			pitch: number
 			bearing: number
 		},
 	): Promise<Fabric> {
@@ -45,7 +60,6 @@ export class FabricService {
 		const updated = await this.repo.update(id, {
 			viewportCenter: viewport.center,
 			viewportZoom: viewport.zoom,
-			viewportPitch: viewport.pitch,
 			viewportBearing: viewport.bearing,
 		})
 		if (!updated) throw new NotFoundError("Fabric not found")
@@ -60,7 +74,6 @@ export class FabricService {
 		const updated = await this.repo.update(id, {
 			originCenter: fabric.viewportCenter,
 			originZoom: fabric.viewportZoom,
-			originPitch: fabric.viewportPitch,
 			originBearing: fabric.viewportBearing,
 		})
 		if (!updated) throw new NotFoundError("Fabric not found")

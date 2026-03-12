@@ -15,9 +15,11 @@ export class FabricRepository {
 		})
 	}
 
-	async findManyByCreatorId(creatorId: string) {
+	async findManyByCreatorId(creatorId: string, options?: { limit?: number }) {
 		return this.client.query.fabrics.findMany({
 			where: { creatorId },
+			orderBy: { updatedAt: "desc" },
+			limit: options?.limit,
 		})
 	}
 

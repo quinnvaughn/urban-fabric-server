@@ -1,7 +1,10 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm"
 import {
 	boolean,
+	doublePrecision,
+	geometry,
 	index,
+	jsonb,
 	pgTable,
 	text,
 	timestamp,
@@ -26,6 +29,18 @@ export const proposals = pgTable(
 		slug: text("slug").notNull().unique(),
 		isPublished: boolean("is_published").notNull().default(false),
 		publishedAt: timestamp("published_at"),
+		// snapshot of fabric state at publish time
+		snapshotElements: jsonb("snapshot_elements"),
+		snapshotCenter: geometry("snapshot_center", {
+			type: "point",
+			mode: "tuple",
+			srid: 4326,
+		}),
+		snapshotZoom: doublePrecision("snapshot_zoom"),
+		snapshotThumbnail: text("snapshot_thumbnail"),
+		snapshotLocationCity: text("snapshot_location_city"),
+		snapshotLocationRegion: text("snapshot_location_region"),
+		snapshotLocationCountry: text("snapshot_location_country"),
 	},
 	(t) => [
 		index("proposals_fabric_id_idx").on(t.fabricId),
@@ -35,5 +50,4 @@ export const proposals = pgTable(
 )
 
 export type Proposal = InferSelectModel<typeof proposals>
-// or for insert type (without required defaults):
 export type ProposalInsert = InferInsertModel<typeof proposals>

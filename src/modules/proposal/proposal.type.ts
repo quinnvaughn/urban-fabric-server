@@ -1,10 +1,7 @@
 import { builder } from "../../graphql/builder"
 import { omitNullish } from "../../graphql/utils"
-import {
-	ForbiddenError,
-	NotFoundError,
-	UnauthorizedError,
-} from "../error"
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
+import { Coordinate } from "../fabric/fabric.type"
 
 builder.objectType("Proposal", {
 	fields: (t) => ({
@@ -16,6 +13,33 @@ builder.objectType("Proposal", {
 		slug: t.exposeString("slug"),
 		isPublished: t.exposeBoolean("isPublished"),
 		publishedAt: t.expose("publishedAt", { type: "DateTime", nullable: true }),
+		snapshotElements: t.field({
+			type: "JSON",
+			resolve: (proposal) =>
+				proposal.snapshotElements as Record<string, unknown>,
+		}),
+		snapshotCenter: t.field({
+			type: Coordinate,
+			nullable: true,
+			resolve: (proposal) => {
+				if (!proposal.snapshotCenter) return null
+				return {
+					lng: proposal.snapshotCenter[0],
+					lat: proposal.snapshotCenter[1],
+				}
+			},
+		}),
+		snapshotZoom: t.exposeFloat("snapshotZoom", { nullable: true }),
+		snapshotThumbnail: t.exposeString("snapshotThumbnail", { nullable: true }),
+		snapshotLocationCity: t.exposeString("snapshotLocationCity", {
+			nullable: true,
+		}),
+		snapshotLocationRegion: t.exposeString("snapshotLocationRegion", {
+			nullable: true,
+		}),
+		snapshotLocationCountry: t.exposeString("snapshotLocationCountry", {
+			nullable: true,
+		}),
 		createdAt: t.expose("createdAt", { type: "DateTime" }),
 		updatedAt: t.expose("updatedAt", { type: "DateTime" }),
 	}),

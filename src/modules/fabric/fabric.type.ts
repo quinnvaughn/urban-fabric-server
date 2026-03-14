@@ -1,7 +1,7 @@
 import { builder } from "../../graphql/builder"
 import { ForbiddenError, NotFoundError, UnauthorizedError } from "../error"
 
-const Coordinate = builder.simpleObject("Coordinate", {
+export const Coordinate = builder.simpleObject("Coordinate", {
 	fields: (t) => ({
 		lng: t.float(),
 		lat: t.float(),
@@ -18,28 +18,19 @@ const CoordinateInput = builder.inputType("CoordinateInput", {
 builder.objectType("Fabric", {
 	fields: (t) => ({
 		id: t.exposeID("id"),
-		changes: t.field({
+		elements: t.field({
 			type: "JSON",
-			resolve: (fabric) => fabric.changes as Record<string, unknown>,
+			resolve: (fabric) => fabric.elements as Record<string, unknown>,
 		}),
-		originCenter: t.field({
+		center: t.field({
 			type: Coordinate,
 			resolve: (fabric) => ({
-				lng: fabric.originCenter[0],
-				lat: fabric.originCenter[1],
+				lng: fabric.center[0],
+				lat: fabric.center[1],
 			}),
 		}),
-		originZoom: t.exposeFloat("originZoom"),
-		originBearing: t.exposeFloat("originBearing"),
-		viewportCenter: t.field({
-			type: Coordinate,
-			resolve: (fabric) => ({
-				lng: fabric.viewportCenter[0],
-				lat: fabric.viewportCenter[1],
-			}),
-		}),
-		viewportZoom: t.exposeFloat("viewportZoom"),
-		viewportBearing: t.exposeFloat("viewportBearing"),
+		thumbnail: t.exposeString("thumbnail", { nullable: true }),
+		zoom: t.exposeFloat("zoom"),
 		title: t.exposeString("title"),
 		locationCity: t.exposeString("locationCity"),
 		locationRegion: t.exposeString("locationRegion"),
@@ -84,12 +75,8 @@ builder.mutationFields((t) => ({
 			const center: [number, number] = [input.center.lng, input.center.lat]
 			return services.fabric.createFabric({
 				creatorId: user.id,
-				originCenter: center,
-				originZoom: 12,
-				originBearing: 0,
-				viewportCenter: center,
-				viewportZoom: 12,
-				viewportBearing: 0,
+				center: center,
+				zoom: 12,
 			})
 		},
 	}),
@@ -100,24 +87,15 @@ builder.mutationFields((t) => ({
 			id: t.input.id(),
 			center: t.input.field({ type: CoordinateInput }),
 			zoom: t.input.float(),
-			bearing: t.input.float(),
+			thumbnail: t.input.string({ required: false }),
 		},
 		resolve: (_parent, { input }, { user, services }) => {
 			if (!user) throw new UnauthorizedError()
 			return services.fabric.syncViewport(input.id, user.id, {
 				center: [input.center.lng, input.center.lat],
 				zoom: input.zoom,
-				bearing: input.bearing,
+				thumbnail: input.thumbnail ?? undefined,
 			})
-		},
-	}),
-	saveView: t.fieldWithInput({
-		type: "Fabric",
-		errors: { types: [UnauthorizedError, NotFoundError, ForbiddenError] },
-		input: { id: t.input.id() },
-		resolve: (_parent, { input }, { user, services }) => {
-			if (!user) throw new UnauthorizedError()
-			return services.fabric.saveView(input.id, user.id)
 		},
 	}),
 	updateFabricTitle: t.fieldWithInput({
@@ -130,6 +108,22 @@ builder.mutationFields((t) => ({
 		resolve: (_parent, { input }, { user, services }) => {
 			if (!user) throw new UnauthorizedError()
 			return services.fabric.updateTitle(input.id, user.id, input.title)
+		},
+	}),
+	updateFabricElements: t.fieldWithInput({
+		type: "Fabric",
+		errors: { types: [UnauthorizedError, NotFoundError, ForbiddenError] },
+		input: {
+			id: t.input.id(),
+			elements: t.input.field({ type: ["JSON"] }),
+		},
+		resolve: (_parent, { input }, { user, services }) => {
+			if (!user) throw new UnauthorizedError()
+			return services.fabric.updateElements(
+				input.id,
+				user.id,
+				input.elements as unknown[],
+			)
 		},
 	}),
 	deleteFabric: t.fieldWithInput({

@@ -1,0 +1,1 @@
+ALTER TABLE "fabrics" RENAME COLUMN "changes" TO "elements";

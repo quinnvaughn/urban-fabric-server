@@ -18,21 +18,14 @@ export const fabrics = pgTable(
 		creatorId: uuid("creator_id")
 			.notNull()
 			.references(() => users.id),
-		changes: jsonb("changes").notNull().default([]),
-		originCenter: geometry("origin_center", {
+		elements: jsonb("elements").notNull().default([]),
+		center: geometry("center", {
 			type: "point",
 			mode: "tuple",
 			srid: 4326,
 		}).notNull(),
-		originZoom: doublePrecision("origin_zoom").notNull(),
-		originBearing: doublePrecision("origin_bearing").notNull(),
-		viewportCenter: geometry("viewport_center", {
-			type: "point",
-			mode: "tuple",
-			srid: 4326,
-		}).notNull(),
-		viewportZoom: doublePrecision("viewport_zoom").notNull(),
-		viewportBearing: doublePrecision("viewport_bearing").notNull(),
+		zoom: doublePrecision("zoom").notNull(),
+		thumbnail: text("thumbnail"),
 		locationCity: text("location_city").notNull(),
 		locationRegion: text("location_region").notNull(),
 		locationCountry: text("location_country").notNull(),
@@ -40,7 +33,7 @@ export const fabrics = pgTable(
 	},
 	(t) => [
 		index("fabrics_creator_id_idx").on(t.creatorId),
-		index("fabrics_origin_center_idx").using("gist", t.originCenter),
+		index("fabrics_center_idx").using("gist", t.center),
 	],
 )
 

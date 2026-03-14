@@ -1,4 +1,4 @@
-import { reverseGeocode } from "../../lib/geocoding"
+import { hasMoved, reverseGeocode } from "../../lib/geocoding"
 import type { DbClient } from "../../types/db"
 import { ForbiddenError, NotFoundError } from "../error"
 import type { Fabric, FabricInsert } from "./fabric.model"
@@ -32,7 +32,7 @@ export class FabricService {
 			| "locationCountry"
 		>,
 	): Promise<Fabric> {
-		const [lng, lat] = input.originCenter
+		const [lng, lat] = input.center
 		const location = await reverseGeocode(lng, lat)
 		const fabric = await this.repo.create({
 			...input,
@@ -50,32 +50,27 @@ export class FabricService {
 		viewport: {
 			center: [number, number]
 			zoom: number
-			bearing: number
+			thumbnail?: string
 		},
 	): Promise<Fabric> {
 		const fabric = await this.repo.findById(id)
 		if (!fabric) throw new NotFoundError("Fabric not found")
 		if (fabric.creatorId !== userId)
 			throw new ForbiddenError("You do not own this fabric")
-		const updated = await this.repo.update(id, {
-			viewportCenter: viewport.center,
-			viewportZoom: viewport.zoom,
-			viewportBearing: viewport.bearing,
-		})
-		if (!updated) throw new NotFoundError("Fabric not found")
-		return updated
-	}
+		const updates: Partial<FabricInsert> = {
+			center: viewport.center,
+			zoom: viewport.zoom,
+			thumbnail: viewport.thumbnail,
+		}
+		if (hasMoved(fabric.center, viewport.center, 1000)) {
+			const [lng, lat] = viewport.center
+			const location = await reverseGeocode(lng, lat)
+			updates.locationCity = location.city
+			updates.locationRegion = location.region
+			updates.locationCountry = location.country
+		}
 
-	async saveView(id: string, userId: string): Promise<Fabric> {
-		const fabric = await this.repo.findById(id)
-		if (!fabric) throw new NotFoundError("Fabric not found")
-		if (fabric.creatorId !== userId)
-			throw new ForbiddenError("You do not own this fabric")
-		const updated = await this.repo.update(id, {
-			originCenter: fabric.viewportCenter,
-			originZoom: fabric.viewportZoom,
-			originBearing: fabric.viewportBearing,
-		})
+		const updated = await this.repo.update(id, updates)
 		if (!updated) throw new NotFoundError("Fabric not found")
 		return updated
 	}
@@ -90,6 +85,20 @@ export class FabricService {
 		if (fabric.creatorId !== userId)
 			throw new ForbiddenError("You do not own this fabric")
 		const updated = await this.repo.update(id, { title })
+		if (!updated) throw new NotFoundError("Fabric not found")
+		return updated
+	}
+
+	async updateElements(
+		id: string,
+		userId: string,
+		elements: unknown[],
+	): Promise<Fabric> {
+		const fabric = await this.repo.findById(id)
+		if (!fabric) throw new NotFoundError("Fabric not found")
+		if (fabric.creatorId !== userId)
+			throw new ForbiddenError("You do not own this fabric")
+		const updated = await this.repo.update(id, { elements })
 		if (!updated) throw new NotFoundError("Fabric not found")
 		return updated
 	}
